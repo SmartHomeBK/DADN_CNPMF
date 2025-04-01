@@ -3,7 +3,7 @@ import axios from 'axios';
 
 /**
  * @swagger
- * /api/devices/ok:
+ * /api/devices:
  *   post:
  *     summary: Create a new device
  *     description: Adds a new device to the system
@@ -62,12 +62,12 @@ const addDevice = async (req, res) => {
 
 /**
  * @swagger
- * /api/env/control/{device}:
+ * /api/device/control/{device}:
  *   post:
  *     summary: Control device (turn on/off)
  *     description: Allows manual control of devices (e.g., turn on/off a light or fan).
  *     tags:
- *       - Environment
+ *       - Devices
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -126,7 +126,7 @@ const controlDevice = async (req, res) => {
             const history = new History({
                 device: updatedDevice._id,
                 user: req.user._id,
-                message: ``,
+                message: `${device} turned ${state} by ${req.user.name}`,
                 time: new Date(),
             });
             await history.save();

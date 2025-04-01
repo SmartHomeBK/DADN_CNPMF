@@ -45,9 +45,13 @@ UserSchema.methods.comparePassword = async function (enteredPassword) {
 };
 
 UserSchema.methods.generateJsonWebToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-        expiresIn: process.env.COOKIE_EXPIRES * 24 * 60 * 60,
-    });
+    return jwt.sign(
+        { id: this._id, email: this.email, name: this.name },
+        process.env.JWT_SECRET_KEY,
+        {
+            expiresIn: process.env.COOKIE_EXPIRES * 24 * 60 * 60,
+        }
+    );
 };
 const User = mongoose.model('User', UserSchema);
 export default User;
