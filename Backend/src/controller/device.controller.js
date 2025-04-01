@@ -1,5 +1,49 @@
 import Device from '../models/device.model.js';
 import axios from 'axios';
+import dotenv from 'dotenv';
+import { BASE_URL, headers } from '../../config/adafruit.js';
+
+dotenv.config({ path: './../Backend/config/.env' });
+
+/**
+ * @swagger
+ * /api/devices:
+ *   get:
+ *     summary: Get all devices
+ *     description: Fetches all devices from the system
+ *     tags:
+ *       - Devices
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all devices
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   DeviceName:
+ *                     type: string
+ *                   Status:
+ *                     type: string
+ *                   Last_updated:
+ *                     type: string
+ *                     format: date-time
+ *       500:
+ *         description: Internal server error
+ */
+const getDevices = async (req, res) => {
+    try {
+        const devices = await Device.find();
+        res.status(200).json(devices);
+    } catch (error) {
+        console.error('Error fetching devices:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 /**
  * @swagger
@@ -109,7 +153,8 @@ const controlDevice = async (req, res) => {
     }
 
     try {
-        const controlUrl = `${BASE_URL}/${device}/data`;
+        const feedName = device.toLowerCase().replace(/\s+/g, '-');
+        const controlUrl = `${BASE_URL}/${feedName}/control`;
         const response = await axios.post(
             controlUrl,
             { value: state },
@@ -144,4 +189,4 @@ const controlDevice = async (req, res) => {
     }
 };
 
-export { addDevice, controlDevice };
+export { addDevice, controlDevice, getDevices };

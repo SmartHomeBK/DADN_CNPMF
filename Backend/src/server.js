@@ -8,6 +8,9 @@ import { fileURLToPath } from 'url';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
+// cronjob for schedule
+import './service/cronjob.js';
+
 dotenv.config({ path: './../Backend/config/.env' });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

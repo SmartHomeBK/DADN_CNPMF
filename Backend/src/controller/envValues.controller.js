@@ -1,17 +1,8 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { BASE_URL, headers } from '../../config/adafruit.js';
 
 dotenv.config({ path: './../Backend/config/.env' });
-const AIO_USERNAME = process.env.AIO_USERNAME;
-console.log('AIO_USERNAME: ', process.env.AIO_USERNAME);
-const AIO_KEY = process.env.AIO_KEY;
-const BASE_URL = `https://io.adafruit.com/api/v2/${AIO_USERNAME}/feeds`;
-
-// Header xác thực với AIO Key
-const headers = {
-    'X-AIO-Key': AIO_KEY,
-    'Content-Type': 'application/json',
-};
 
 /**
  * @swagger

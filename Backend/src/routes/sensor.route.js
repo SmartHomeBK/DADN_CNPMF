@@ -9,8 +9,8 @@ import {
 const route = Router();
 
 route.get('', getAllSensors);
-route.post('', addSensor); // Assuming this is for creating a new sensor
 route.get('/:type', getSensorByType);
+route.post('', addSensor); // Assuming this is for creating a new sensor
 route.put('/:sensorId/threshold', setThreshold);
 
 export const SensorRoute = route;

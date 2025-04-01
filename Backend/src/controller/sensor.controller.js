@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Sensor from '../models/sensor.model.js';
+import { BASE_URL, headers } from '../../config/adafruit.js';
 
 /**
  * @swagger
@@ -9,6 +10,8 @@ import Sensor from '../models/sensor.model.js';
  *     description: Retrieves all sensors from the database.
  *     tags:
  *       - Sensors
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Sensors retrieved successfully
@@ -31,12 +34,61 @@ const getAllSensors = async (req, res) => {
 
 /**
  * @swagger
+ * /api/sensors/{type}:
+ *   get:
+ *     summary: Get sensor by type
+ *     description: Retrieves a sensor by its type (e.g., "temperature", "humidity").
+ *     tags:
+ *       - Sensors
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         description: Type of the sensor (e.g., "temperature", "humidity")
+ *         schema:
+ *           type: string
+ *           example: "temperature"
+ *     responses:
+ *       200:
+ *         description: Sensor retrieved successfully
+ *       404:
+ *         description: Sensor not found
+ *       500:
+ *         description: Internal server error
+ */
+const getSensorByType = async (req, res) => {
+    const { type } = req.params;
+
+    try {
+        const sensor = await Sensor.findOne({ type });
+
+        if (!sensor) {
+            return res.status(404).json({ error: 'Sensor not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Sensor retrieved successfully',
+            sensor,
+        });
+    } catch (error) {
+        console.error('Error retrieving sensor:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve sensor' });
+    }
+};
+
+/**
+ * @swagger
  * /api/sensors:
  *   post:
  *     summary: Add a new sensor
  *     description: Adds a new sensor to the database.
  *     tags:
  *       - Sensors
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -103,7 +155,7 @@ const addSensor = async (req, res) => {
 /**
  * @swagger
  * /api/sensors/{type}/threshold:
- *   post:
+ *   put:
  *     summary: Set threshold for a sensor by type
  *     description: Sets the maximum and minimum value threshold for a sensor based on its type and sends it to Adafruit IO.
  *     tags:
@@ -162,7 +214,7 @@ const setThreshold = async (req, res) => {
             return res.status(404).json({ error: 'Sensor not found' });
         }
 
-        const adafruitIoUrl = `https://io.adafruit.com/api/v2/${process.env.ADAFRUIT_IO_USERNAME}/feeds/${process.env.ADAFRUIT_IO_FEED_NAME}/data`;
+        const adafruitIoUrl = `${BASE_URL}/${type}/threshold`;
         const response = await axios.post(
             adafruitIoUrl,
             {
@@ -172,10 +224,7 @@ const setThreshold = async (req, res) => {
                 }),
             },
             {
-                headers: {
-                    'X-AIO-Key': process.env.ADAFRUIT_IO_KEY,
-                    'Content-Type': 'application/json',
-                },
+                headers,
             }
         );
 
@@ -201,51 +250,6 @@ const setThreshold = async (req, res) => {
     } catch (error) {
         console.error('Error setting threshold:', error.message);
         res.status(500).json({ error: 'Failed to set threshold' });
-    }
-};
-
-/**
- * @swagger
- * /api/sensors/{type}:
- *   get:
- *     summary: Get sensor by type
- *     description: Retrieves a sensor by its type (e.g., "temperature", "humidity").
- *     tags:
- *       - Sensors
- *     parameters:
- *       - in: path
- *         name: type
- *         required: true
- *         description: Type of the sensor (e.g., "temperature", "humidity")
- *         schema:
- *           type: string
- *           example: "temperature"
- *     responses:
- *       200:
- *         description: Sensor retrieved successfully
- *       404:
- *         description: Sensor not found
- *       500:
- *         description: Internal server error
- */
-const getSensorByType = async (req, res) => {
-    const { type } = req.params;
-
-    try {
-        const sensor = await Sensor.findOne({ type });
-
-        if (!sensor) {
-            return res.status(404).json({ error: 'Sensor not found' });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'Sensor retrieved successfully',
-            sensor,
-        });
-    } catch (error) {
-        console.error('Error retrieving sensor:', error.message);
-        res.status(500).json({ error: 'Failed to retrieve sensor' });
     }
 };
 
