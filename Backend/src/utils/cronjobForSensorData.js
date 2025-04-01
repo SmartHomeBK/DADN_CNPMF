@@ -20,18 +20,11 @@ const fetchAndSaveSensorData = async () => {
         const lightValue = parseFloat(lightRes.data.last_value);
         const timestamp = new Date();
 
-        console.log('Fetched data:', {
-            humid: humidValue,
-            temp: tempValue,
-            light: lightValue,
-        });
-
         const humidSensor = await Sensor.findOne({ type: 'humid' });
         const tempSensor = await Sensor.findOne({ type: 'temperature' });
         const lightSensor = await Sensor.findOne({ type: 'light' });
 
         const sensorDataEntries = [];
-
         if (humidSensor) {
             sensorDataEntries.push({
                 sensor: humidSensor._id,
@@ -51,7 +44,8 @@ const fetchAndSaveSensorData = async () => {
         if (lightSensor) {
             sensorDataEntries.push({
                 sensor: lightSensor._id,
-                value: lightValue,
+                // value: lightValue,
+                value: 50,
                 recorded_at: timestamp,
             });
         }

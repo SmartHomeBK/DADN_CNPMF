@@ -6,5 +6,5 @@ import {
 export const route = Router();
 
 route.get('/humid', getEnvironmentValues);
-route.get('/api/env/humid/range', getEnvironmentDataInRange);
+route.get('/humid/range', getEnvironmentDataInRange);
 export const EnvRouter = route;

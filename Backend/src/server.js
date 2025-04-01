@@ -9,7 +9,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 // cronjob for schedule
-import './utils/cronjobForSchedule.js';
+// import './utils/cronjobForSchedule.js';
 // cronjob for sensorData
 // import './utils/cronjobForSensorData.js';
 
@@ -62,7 +62,15 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocs, {
+        swaggerOptions: {
+            withCredentials: true, // Enable credentials to allow cookies to be sent
+        },
+    })
+);
 console.log(`The api can see on localhost:${process.env.PORT}/api-docs`);
 
 app.use(root);
