@@ -1,6 +1,7 @@
 import axios from "axios";
 import { BellRing, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { axiosInstance } from "../../util/http.js";
 
 const HomePage = ({
   date = "21 Feb 2023",
@@ -16,7 +17,7 @@ const HomePage = ({
   });
   const fetchData = async () => {
     try {
-      const result = await axios.get("http://localhost:8080/api/env/humid");
+      const result = await axiosInstance.get("/env/humid");
       console.log("result in fetch env data: ", result);
       const { humid, temp, light } = result.data;
       setEnvironmentValues({
