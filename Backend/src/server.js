@@ -7,9 +7,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-
+import cookieParser from "cookie-parser";
 // cronjob for schedule
 import "./service/cronjob.js";
+import { errorMiddleWare } from "./middleWares/errorMiddleware.middleware.js";
 
 dotenv.config({ path: "./../Backend/config/.env" });
 const __filename = fileURLToPath(import.meta.url);
@@ -67,6 +68,7 @@ app.use(root);
 await dbConnect();
 
 app.use(errorMiddleWare);
+
 app.listen(process.env.PORT, () => {
   console.log(`Server is listening on the PORT ${process.env.PORT}`);
 });
