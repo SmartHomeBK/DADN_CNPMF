@@ -8,7 +8,7 @@ export const isUserAuthenticated = async (req, res, next) => {
     const token = req.cookies.UserToken;
     console.log("token user: ", token);
     if (!token) {
-      return res.status(301).json({
+      return res.status(401).json({
         success: false,
         message: "User Is Not Authenticated !",
       });

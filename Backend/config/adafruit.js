@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: 'config/.env' });
 
 const AIO_USERNAME = process.env.AIO_USERNAME;
+console.log('AIO_USERNAME: ', AIO_USERNAME);
 const AIO_KEY = process.env.AIO_KEY;
 
 // Base URL for Adafruit IO

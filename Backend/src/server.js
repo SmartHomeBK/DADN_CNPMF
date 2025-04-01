@@ -7,11 +7,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-
+import cookieParser from 'cookie-parser';
 // cronjob for schedule
-// import './utils/cronjobForSchedule.js';
+// import "./utils/cronjobForSchedule.js';
 // cronjob for sensorData
-// import './utils/cronjobForSensorData.js';
+// import './utils/cronjobForSensorData.js";
+import { errorMiddleWare } from './middleWares/errorMiddleware.middleware.js';
 
 dotenv.config({ path: './../Backend/config/.env' });
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +20,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(
     cors({
         origin: [
@@ -75,6 +77,8 @@ console.log(`The api can see on localhost:${process.env.PORT}/api-docs`);
 
 app.use(root);
 await dbConnect();
+
+app.use(errorMiddleWare);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is listening on the PORT ${process.env.PORT}`);

@@ -1,7 +1,8 @@
 import axios from "axios";
 import { BellRing, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { axiosInstance } from "../../util/http.js";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = ({
   date = "21 Feb 2023",
@@ -19,7 +20,7 @@ const HomePage = ({
 
   const fetchData = async () => {
     try {
-      const result = await axios.get("http://localhost:8080/api/env/humid");
+      const result = await axiosInstance.get("/env/humid");
       console.log("result in fetch env data: ", result);
       const { humid, temp, light } = result.data;
       setEnvironmentValues({
@@ -64,12 +65,10 @@ const HomePage = ({
         <div className=" left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
           <div className="px-5 pt-[100px]">
             <button className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors">
-              <span className="font-inter text-base text-[#21255a]">
-                Home
-              </span>
+              <span className="font-inter text-base text-[#21255a]">Home</span>
             </button>
             <button
-              onClick={() => navigate('/statistics')}
+              onClick={() => navigate("/statistics")}
               className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
             >
               <span className="font-inter text-base text-[#21255a]">
@@ -77,7 +76,7 @@ const HomePage = ({
               </span>
             </button>
             <button
-              onClick={() => navigate('/control-devices')}
+              onClick={() => navigate("/control-devices")}
               className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
             >
               <span className="font-inter text-base text-[#21255a]">
@@ -85,7 +84,7 @@ const HomePage = ({
               </span>
             </button>
             <button
-              onClick={() => navigate('/scheduler')}
+              onClick={() => navigate("/scheduler")}
               className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
             >
               <span className="font-inter text-base text-[#21255a]">
