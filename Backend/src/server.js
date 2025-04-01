@@ -26,9 +26,6 @@ app.use(
     })
 );
 
-app.use(root);
-await dbConnect();
-
 // Swagger configuration
 const swaggerOptions = {
     definition: {
@@ -37,6 +34,17 @@ const swaggerOptions = {
             title: 'IoT System API',
             version: '1.0.0',
             description: 'API documentation for the IoT system backend',
+        },
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                    description:
+                        'Enter JWT token in format: Bearer <your_token>',
+                },
+            },
         },
         servers: [
             {
@@ -51,6 +59,9 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 console.log(`The api can see on localhost:${process.env.PORT}/api-docs`);
+
+app.use(root);
+await dbConnect();
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is listening on the PORT ${process.env.PORT}`);

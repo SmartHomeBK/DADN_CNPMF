@@ -21,6 +21,8 @@ const headers = {
  *     description: Fetches the latest humidity, temperature, and light values from Adafruit IO.
  *     tags:
  *       - Environment
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully retrieved environment values

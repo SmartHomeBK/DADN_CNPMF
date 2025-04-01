@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose';
 const sensorSchema = new mongoose.Schema(
     {
         type: String,
@@ -10,4 +9,5 @@ const sensorSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model('Sensor', sensorSchema);
+const Sensor = mongoose.model('Sensor', sensorSchema);
+export default Sensor;

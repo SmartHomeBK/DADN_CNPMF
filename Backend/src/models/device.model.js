@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const deviceSchema = new mongoose.Schema(
     {
@@ -11,4 +11,5 @@ const deviceSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model('Device', deviceSchema);
+const Device = mongoose.model('Device', deviceSchema);
+export default Device;
