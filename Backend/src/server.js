@@ -9,7 +9,9 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 // cronjob for schedule
-import './service/cronjob.js';
+import './utils/cronjobForSchedule.js';
+// cronjob for sensorData
+// import './utils/cronjobForSensorData.js';
 
 dotenv.config({ path: './../Backend/config/.env' });
 const __filename = fileURLToPath(import.meta.url);

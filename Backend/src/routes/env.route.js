@@ -1,6 +1,10 @@
 import { Router } from 'express';
-import { getEnvironmentValues } from '../controller/envValues.controller.js';
+import {
+    getEnvironmentDataInRange,
+    getEnvironmentValues,
+} from '../controller/envValues.controller.js';
 export const route = Router();
 
 route.get('/humid', getEnvironmentValues);
+route.get('/api/env/humid/range', getEnvironmentDataInRange);
 export const EnvRouter = route;

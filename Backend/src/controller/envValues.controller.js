@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { BASE_URL, headers } from '../../config/adafruit.js';
+import SensorData from '../models/sensorData.model.js';
 
 dotenv.config({ path: './../Backend/config/.env' });
 
@@ -34,7 +35,7 @@ dotenv.config({ path: './../Backend/config/.env' });
  *       500:
  *         description: Failed to fetch environment data
  */
-export const getEnvironmentValues = async (req, res) => {
+const getEnvironmentValues = async (req, res) => {
     try {
         const [humidRes, tempRes, lightRes] = await Promise.all([
             axios.get(`${BASE_URL}/humid`, { headers }),
@@ -42,12 +43,10 @@ export const getEnvironmentValues = async (req, res) => {
             axios.get(`${BASE_URL}/light`, { headers }),
         ]);
 
-        // Destructure lấy dữ liệu cần
         const { last_value: humid } = humidRes.data;
         const { last_value: temp } = tempRes.data;
         const { last_value: light } = lightRes.data;
         console.log('data from getHumid: ', humid, temp, light);
-        // Gửi response về client
         res.json({ humid, temp, light });
     } catch (error) {
         console.error(
@@ -57,3 +56,99 @@ export const getEnvironmentValues = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch humid data' });
     }
 };
+
+/**
+ * @swagger
+ * /api/env/humid/range:
+ *   get:
+ *     summary: Get environment values (humidity, temperature, light) for a time range from the database
+ *     description: Fetches the humidity, temperature, and light values for the specified time range from the database.
+ *     tags:
+ *       - Environment
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startTime
+ *         required: true
+ *         description: The start time of the range to fetch data for.
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-04-01T12:00:00Z"
+ *       - in: query
+ *         name: endTime
+ *         required: true
+ *         description: The end time of the range to fetch data for.
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-04-01T12:05:00Z"
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved environment values
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 humid:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                   example: [55.5, 56.2, 57.3]
+ *                 temp:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                   example: [27.3, 27.4, 27.5]
+ *                 light:
+ *                   type: array
+ *                   items:
+ *                     type: number
+ *                   example: [500, 505, 510]
+ *       500:
+ *         description: Failed to fetch or store environment data
+ */
+const getEnvironmentDataInRange = async (req, res) => {
+    const { startTime, endTime } = req.query;
+
+    try {
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
+
+        const sensorData = await SensorData.find({
+            recorded_at: { $gte: startDate, $lte: endDate },
+        })
+            .populate('sensor', 'type')
+            .lean();
+
+        const humidData = sensorData.filter(
+            (data) => data.sensor.type === 'humidity'
+        );
+        const tempData = sensorData.filter(
+            (data) => data.sensor.type === 'temperature'
+        );
+        const lightData = sensorData.filter(
+            (data) => data.sensor.type === 'light'
+        );
+
+        const humidValues = humidData.map((data) => data.value);
+        const tempValues = tempData.map((data) => data.value);
+        const lightValues = lightData.map((data) => data.value);
+
+        res.status(200).json({
+            humid: humidValues,
+            temp: tempValues,
+            light: lightValues,
+        });
+    } catch (error) {
+        console.error(
+            'Error fetching environment data from the database:',
+            error.message
+        );
+        res.status(500).json({ error: 'Failed to fetch environment data' });
+    }
+};
+
+export { getEnvironmentValues, getEnvironmentDataInRange };

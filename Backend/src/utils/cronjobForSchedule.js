@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import Schedule from '../models/schedule.model.js';
+import Device from '../models/device.model.js';
 import { BASE_URL, headers } from '../../config/adafruit.js';
 
 dotenv.config();
@@ -11,7 +12,7 @@ cron.schedule('* * * * *', async () => {
     const now = new Date();
     const currentTime = now.toTimeString().slice(0, 5); // Lấy HH:mm
 
-    console.log(`Checking schedules for time: ${currentTime}`);
+    // console.log(`Checking schedules for time: ${currentTime}`);
 
     try {
         const schedules = await Schedule.find({
