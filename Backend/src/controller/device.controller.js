@@ -25,11 +25,15 @@ dotenv.config({ path: './../Backend/config/.env' });
  *               items:
  *                 type: object
  *                 properties:
- *                   DeviceName:
+ *                   name:
  *                     type: string
- *                   Status:
+ *                   type:
  *                     type: string
- *                   Last_updated:
+ *                   status:
+ *                     type: string
+ *                   location:
+ *                     type: string
+ *                   last_updated:
  *                     type: string
  *                     format: date-time
  *       500:
@@ -62,12 +66,18 @@ const getDevices = async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               DeviceName:
+ *               name:
  *                 type: string
  *                 example: "Temperature Sensor"
- *               Status:
+ *               type:
+ *                 type: string
+ *                 example: "sensor"
+ *               status:
  *                 type: string
  *                 example: "off"
+ *               location:
+ *                 type: string
+ *                 example: "Greenhouse"
  *     responses:
  *       201:
  *         description: Successfully created device
@@ -78,18 +88,18 @@ const getDevices = async (req, res) => {
  */
 const addDevice = async (req, res) => {
     try {
-        const { DeviceName, Status } = req.body;
+        const { name, type, status, location } = req.body;
 
-        if (!DeviceName || !Status) {
-            return res
-                .status(400)
-                .json({ error: 'DeviceName and Status are required' });
+        if (!name || !type || !status || !location) {
+            return res.status(400).json({ error: 'All fields are required' });
         }
 
         const newDevice = new Device({
-            DeviceName,
-            Status,
-            Last_updated: new Date(),
+            name,
+            type,
+            status,
+            location,
+            last_updated: new Date(),
         });
 
         await newDevice.save();
@@ -106,8 +116,8 @@ const addDevice = async (req, res) => {
 
 /**
  * @swagger
- * /api/device/control/{device}:
- *   post:
+ * /api/devices/control/{name}:
+ *   put:
  *     summary: Control device (turn on/off)
  *     description: Allows manual control of devices (e.g., turn on/off a light or fan).
  *     tags:
@@ -116,12 +126,12 @@ const addDevice = async (req, res) => {
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: device
+ *         name: name
  *         required: true
- *         description: Device to control (light, fan, etc.)
+ *         description: Device name to control
  *         schema:
  *           type: string
- *           example: "light"
+ *           example: "Temperature Sensor"
  *     requestBody:
  *       required: true
  *       content:
@@ -129,54 +139,49 @@ const addDevice = async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               state:
+ *               status:
  *                 type: string
  *                 enum: [on, off]
- *                 description: State to turn the device on or off
  *                 example: "on"
  *     responses:
  *       200:
  *         description: Successfully controlled device
  *       400:
- *         description: Invalid device or state
+ *         description: Invalid device or status
  *       500:
  *         description: Failed to control device
  */
 const controlDevice = async (req, res) => {
-    const { device } = req.params;
-    const { state } = req.body;
+    const { name } = req.params;
+    const { status } = req.body;
 
-    if (!['on', 'off'].includes(state)) {
+    if (!['on', 'off'].includes(status)) {
         return res
             .status(400)
-            .json({ error: 'Invalid state. Use "on" or "off".' });
+            .json({ error: 'Invalid status. Use "on" or "off".' });
     }
 
     try {
-        const feedName = device.toLowerCase().replace(/\s+/g, '-');
+        const feedName = name.toLowerCase().replace(/\s+/g, '-');
         const controlUrl = `${BASE_URL}/${feedName}/control`;
         const response = await axios.post(
             controlUrl,
-            { value: state },
+            { value: status },
             { headers }
         );
 
         if (response.status === 200) {
             const updatedDevice = await Device.findOneAndUpdate(
-                { DeviceName: device },
-                { Status: state, Last_updated: new Date() },
+                { name },
+                { status, last_updated: new Date() },
                 { new: true }
             );
 
-            const history = new History({
-                device: updatedDevice._id,
-                user: req.user._id,
-                message: `${device} turned ${state} by ${req.user.name}`,
-                time: new Date(),
-            });
-            await history.save();
+            if (!updatedDevice) {
+                return res.status(404).json({ error: 'Device not found' });
+            }
 
-            res.json({ success: true, message: `${device} turned ${state}` });
+            res.json({ success: true, message: `${name} turned ${status}` });
         } else {
             res.status(500).json({ error: 'Failed to control device' });
         }

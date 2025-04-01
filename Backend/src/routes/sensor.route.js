@@ -11,6 +11,6 @@ const route = Router();
 route.get('', getAllSensors);
 route.get('/:type', getSensorByType);
 route.post('', addSensor); // Assuming this is for creating a new sensor
-route.put('/:sensorId/threshold', setThreshold);
+route.put('/:type/threshold', setThreshold);
 
 export const SensorRoute = route;

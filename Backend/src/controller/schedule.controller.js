@@ -3,7 +3,6 @@ import Schedule from '../models/schedule.model.js';
 import History from '../models/history.model.js';
 import Device from '../models/device.model.js';
 import dotenv from 'dotenv';
-import { BASE_URL, headers } from '../../config/adafruit.js';
 
 dotenv.config({ path: './../Backend/config/.env' });
 
@@ -132,7 +131,7 @@ const getSchedulesByDeviceName = async (req, res) => {
 
 /**
  * @swagger
- * /api/schedule:
+ * /api/schedules:
  *   post:
  *     summary: Create a schedule for controlling a device
  *     description: Allows users to set a schedule for controlling a device at a specific time.
@@ -150,7 +149,7 @@ const getSchedulesByDeviceName = async (req, res) => {
  *               deviceId:
  *                 type: string
  *                 description: ID of the device to schedule
- *                 example: "60a5c8b8f1b0e2d2f4a1c2b1"
+ *                 example: "67ebddd0d12aa76bcecd5085"
  *               start_time:
  *                 type: string
  *                 description: The time when the action will be triggered, in HH:mm format
@@ -206,6 +205,10 @@ const setSchedule = async (req, res) => {
         if (!device) {
             return res.status(404).json({ error: 'Device not found' });
         }
+        const oldSchedule = await Schedule.findOne({ start_time });
+        if (oldSchedule) {
+            return res.status(400).json({ error: 'Schedule already exists' });
+        }
 
         const schedule = new Schedule({ device: deviceId, start_time, action });
         await schedule.save();
@@ -233,7 +236,7 @@ const setSchedule = async (req, res) => {
 
 /**
  * @swagger
- * /api/schedule/{scheduleId}:
+ * /api/schedules/{scheduleId}:
  *   delete:
  *     summary: Delete a schedule
  *     description: Deletes a schedule by its ID and removes the corresponding schedule from Adafruit IO.
