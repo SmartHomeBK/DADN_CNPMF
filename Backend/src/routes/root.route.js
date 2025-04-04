@@ -9,6 +9,7 @@ import { HistoryRoute } from "./history.route.js";
 
 const root = Router();
 root.use("/api/auth", AuthRouter);
+
 root.use(isUserAuthenticated);
 root.use("/api/env", EnvRouter);
 root.use("/api/devices", DeviceRoute);
