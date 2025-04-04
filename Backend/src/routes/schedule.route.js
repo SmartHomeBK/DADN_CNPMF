@@ -8,12 +8,12 @@ import {
 
 const route = Router();
 
-route.get('/schedules', getAllSchedules);
+route.get('/', getAllSchedules);
 
-route.get('/schedules/device/:deviceName', getSchedulesByDeviceName);
+route.get('/device/:deviceName', getSchedulesByDeviceName);
 
-route.post('/schedule', setSchedule);
+route.post('/', setSchedule);
 
-route.delete('/schedule/:scheduleId', deleteSchedule);
+route.delete('/:scheduleId', deleteSchedule);
 
 export const ScheduleRoute = route;

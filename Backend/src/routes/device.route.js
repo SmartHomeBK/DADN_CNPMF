@@ -1,8 +1,13 @@
 import { Router } from 'express';
-import { addDevice, controlDevice } from '../controller/device.controller.js';
+import {
+    addDevice,
+    controlDevice,
+    getDevices,
+} from '../controller/device.controller.js';
 
 const route = Router();
 
+route.get('', getDevices);
 route.post('', addDevice);
-route.post('/control/:device', controlDevice);
+route.put('/control/:name', controlDevice);
 export const DeviceRoute = route;

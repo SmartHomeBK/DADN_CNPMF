@@ -26,11 +26,15 @@ dotenv.config({ path: "./../Backend/config/.env" });
  *               items:
  *                 type: object
  *                 properties:
- *                   DeviceName:
+ *                   name:
  *                     type: string
- *                   Status:
+ *                   type:
  *                     type: string
- *                   Last_updated:
+ *                   status:
+ *                     type: string
+ *                   location:
+ *                     type: string
+ *                   last_updated:
  *                     type: string
  *                     format: date-time
  *       500:
@@ -63,12 +67,18 @@ const getDevices = async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               DeviceName:
+ *               name:
  *                 type: string
  *                 example: "Temperature Sensor"
- *               Status:
+ *               type:
+ *                 type: string
+ *                 example: "sensor"
+ *               status:
  *                 type: string
  *                 example: "off"
+ *               location:
+ *                 type: string
+ *                 example: "Greenhouse"
  *     responses:
  *       201:
  *         description: Successfully created device
@@ -79,18 +89,18 @@ const getDevices = async (req, res) => {
  */
 const addDevice = async (req, res) => {
   try {
-    const { DeviceName, Status } = req.body;
+    const { name, type, status, location } = req.body;
 
-    if (!DeviceName || !Status) {
-      return res
-        .status(400)
-        .json({ error: "DeviceName and Status are required" });
+    if (!name || !type || !status || !location) {
+      return res.status(400).json({ error: "All fields are required" });
     }
 
     const newDevice = new Device({
-      name: DeviceName,
-      status: Status,
-      Last_updated: new Date(),
+      name,
+      type,
+      status,
+      location,
+      last_updated: new Date(),
     });
 
     await newDevice.save();
@@ -107,8 +117,8 @@ const addDevice = async (req, res) => {
 
 /**
  * @swagger
- * /api/device/control/{device}:
- *   post:
+ * /api/devices/control/{name}:
+ *   put:
  *     summary: Control device (turn on/off)
  *     description: Allows manual control of devices (e.g., turn on/off a light or fan).
  *     tags:
@@ -117,12 +127,12 @@ const addDevice = async (req, res) => {
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: device
+ *         name: name
  *         required: true
- *         description: Device to control (light, fan, etc.)
+ *         description: Device name to control
  *         schema:
  *           type: string
- *           example: "light"
+ *           example: "Temperature Sensor"
  *     requestBody:
  *       required: true
  *       content:
@@ -130,16 +140,15 @@ const addDevice = async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               state:
+ *               status:
  *                 type: string
  *                 enum: [on, off]
- *                 description: State to turn the device on or off
  *                 example: "on"
  *     responses:
  *       200:
  *         description: Successfully controlled device
  *       400:
- *         description: Invalid device or state
+ *         description: Invalid device or status
  *       500:
  *         description: Failed to control device
  */

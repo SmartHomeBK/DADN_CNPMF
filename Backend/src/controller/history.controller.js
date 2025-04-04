@@ -1,6 +1,26 @@
 import History from '../models/history.model.js';
 import User from '../models/user.model.js';
 import Device from '../models/device.model.js';
+import jwt from 'jsonwebtoken';
+
+// Middleware to authenticate using Bearer token
+const authenticate = (req, res, next) => {
+    const token = req.header('Authorization')?.replace('Bearer ', ''); // Extract token from Authorization header
+
+    if (!token) {
+        return res
+            .status(401)
+            .json({ error: 'Authentication token is missing' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the JWT token
+        req.user = decoded; // Attach decoded user info to the request object
+        next(); // Proceed to the next middleware or route handler
+    } catch (error) {
+        res.status(403).json({ error: 'Invalid or expired token' });
+    }
+};
 
 /**
  * @swagger
@@ -10,6 +30,8 @@ import Device from '../models/device.model.js';
  *     description: Fetches all history entries from the system.
  *     tags:
  *       - History
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: List of all history entries
@@ -54,6 +76,8 @@ const getAllHistory = async (req, res) => {
  *     description: Retrieves history entries for a specific user based on their name.
  *     tags:
  *       - History
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userName
@@ -115,6 +139,8 @@ const getHistoryByUserName = async (req, res) => {
  *     description: Retrieves history entries for a specific device based on its name.
  *     tags:
  *       - History
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: deviceName
@@ -168,4 +194,10 @@ const getHistoryByDeviceName = async (req, res) => {
     }
 };
 
-export { getAllHistory, getHistoryByUserName, getHistoryByDeviceName };
+// Apply authenticate middleware to protect routes that require authentication
+export {
+    authenticate,
+    getAllHistory,
+    getHistoryByUserName,
+    getHistoryByDeviceName,
+};
