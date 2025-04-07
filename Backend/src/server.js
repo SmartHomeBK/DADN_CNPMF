@@ -35,8 +35,9 @@ app.use(cookieParser());
 
 app.use(
     cors({
-        origin: true, // Reflect the request origin
-        credentials: true, // Allow cookies and credentials
+        origin: true,
+        method: ['POST', 'PUT', 'DELETE', 'GET'],
+        credentials: true,
     })
 );
 
@@ -62,7 +63,10 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: `http://localhost:${process.env.PORT}`,
+                url:
+                    process.env === 'DEVELOPMENT'
+                        ? `http://localhost:${process.env.PORT}`
+                        : 'https://dadn-cnpmf.onrender.com',
             },
         ],
     },
@@ -83,9 +87,9 @@ app.use(
 console.log(
     `The api can see on ${
         process.env.NODE_ENV === 'DEVELOPMENT'
-            ? 'localhost'
-            : 'https://dadn-cnpmf.onrender.com/'
-    }:${process.env.PORT}/api-docs`
+            ? 'localhost:' + process.env.PORT
+            : 'https://dadn-cnpmf.onrender.com'
+    }/api-docs`
 );
 
 app.use(root);
