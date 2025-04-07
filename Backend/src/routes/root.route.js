@@ -8,6 +8,16 @@ import { HistoryRoute } from './history.route.js';
 import { isUserAuthenticatedByBearer } from '../middleWares/verifyTokenByBearer.middleware.js';
 
 const root = Router();
+<<<<<<< HEAD
+root.use("/api/auth", AuthRouter);
+
+root.use(isUserAuthenticated);
+root.use("/api/env", EnvRouter);
+root.use("/api/devices", DeviceRoute);
+root.use("/api/sensors", SensorRoute);
+root.use("/api/schedules", ScheduleRoute);
+root.use("/api/history", HistoryRoute);
+=======
 root.use('/api/auth', AuthRouter);
 root.use(isUserAuthenticatedByBearer);
 root.use('/api/env', EnvRouter);
@@ -15,4 +25,5 @@ root.use('/api/devices', DeviceRoute);
 root.use('/api/sensors', SensorRoute);
 root.use('/api/schedules', ScheduleRoute);
 root.use('/api/history', HistoryRoute);
+>>>>>>> 3272cd846d334d7d76d876f11b865206f967fd14
 export default root;
