@@ -9,8 +9,7 @@ import { isUserAuthenticatedByBearer } from "../middleWares/verifyTokenByBearer.
 
 const root = Router();
 root.use("/api/auth", AuthRouter);
-
-root.use(isUserAuthenticated);
+root.use(isUserAuthenticatedByBearer);
 root.use("/api/env", EnvRouter);
 root.use("/api/devices", DeviceRoute);
 root.use("/api/sensors", SensorRoute);

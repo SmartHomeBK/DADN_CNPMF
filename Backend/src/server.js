@@ -21,15 +21,23 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+// app.use(
+//     cors({
+//         origin: [
+//             'http://localhost:5173',
+//             'https://app.ohstem.vn/',
+//             'http://localhost:5174',
+//         ],
+//         method: ['POST', 'PUT', 'DELETE', 'GET'],
+//         credentials: true, //allow cookie be sent with request.
+//     })
+// );
+
 app.use(
     cors({
-        origin: [
-            'http://localhost:5173',
-            'https://app.ohstem.vn/',
-            'http://localhost:5174',
-        ],
+        origin: true,
         method: ['POST', 'PUT', 'DELETE', 'GET'],
-        credentials: true, //allow cookie be sent with request.
+        credentials: true,
     })
 );
 
@@ -55,7 +63,10 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: `http://localhost:${process.env.PORT}`,
+                url:
+                    process.env === 'DEVELOPMENT'
+                        ? `http://localhost:${process.env.PORT}`
+                        : 'https://dadn-cnpmf.onrender.com',
             },
         ],
     },
@@ -73,13 +84,19 @@ app.use(
         },
     })
 );
-console.log(`The api can see on localhost:${process.env.PORT}/api-docs`);
+console.log(
+    `The api can see on ${
+        process.env.NODE_ENV === 'DEVELOPMENT'
+            ? 'localhost:' + process.env.PORT
+            : 'https://dadn-cnpmf.onrender.com'
+    }/api-docs`
+);
 
 app.use(root);
 await dbConnect();
 
 app.use(errorMiddleWare);
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server is listening on the PORT ${process.env.PORT}`);
+app.listen(process.env.PORT || 8080, () => {
+    console.log(`Server is listening on the PORT ${process.env.PORT || 8080}`);
 });

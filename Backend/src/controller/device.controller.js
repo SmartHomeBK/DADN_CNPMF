@@ -153,15 +153,15 @@ const addDevice = async (req, res) => {
  *         description: Failed to control device
  */
 const controlDevice = async (req, res) => {
-  const { device } = req.params;
+  const { name } = req.params;
   const { state } = req.body;
-
+  console.log("device name: ", name);
   if (!["1", "0"].includes(state)) {
     return res.status(400).json({ error: 'Invalid state. Use "1" or "0".' });
   }
 
   try {
-    const feedName = device.toLowerCase().replace(/\s+/g, "-");
+    const feedName = name.toLowerCase().replace(/\s+/g, "-");
     const controlUrl = `${BASE_URL}/${feedName}/data`;
     const response = await axios.post(
       controlUrl,
@@ -170,9 +170,9 @@ const controlDevice = async (req, res) => {
     );
     console.log("response from update light: ", response);
     if (response.status === 200) {
-      console.log("feedName: ", device);
+      console.log("feedName: ", name);
       const updatedDevice = await Device.findOneAndUpdate(
-        { name: device },
+        { name },
         { status: state, Last_updated: new Date() },
         { new: true }
       );
@@ -181,14 +181,14 @@ const controlDevice = async (req, res) => {
         const history = new History({
           device: updatedDevice._id,
           user: req.user._id,
-          message: `${device} turned ${state} by ${req.user.name}`,
+          message: `${name} turned ${state} by ${req.user.name}`,
           time: new Date(),
         });
         await history.save();
 
         return res.json({
           success: true,
-          message: `${device} turned ${state}`,
+          message: `${name} turned ${state}`,
         });
       }
       res.json({
