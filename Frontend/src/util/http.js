@@ -1,5 +1,6 @@
 import axios from "axios";
-const token = JSON.parse(localStorage.getItem("UserToken"));
+const token = localStorage.getItem("UserToken");
+
 console.log("token in http: ", token);
 export const axiosInstance = axios.create({
   baseURL: "http://localhost:8080/api",
@@ -9,3 +10,15 @@ export const axiosInstance = axios.create({
     authorization: `Bearer ${token}`,
   },
 });
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("UserToken");
+    if (token) {
+      config.headers["authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);

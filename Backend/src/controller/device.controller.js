@@ -153,9 +153,9 @@ const addDevice = async (req, res) => {
  *         description: Failed to control device
  */
 const controlDevice = async (req, res) => {
-    const { name: device } = req.params;
+    const { name } = req.params;
     const { state } = req.body;
-
+    console.log('device name: ', name);
     if (!['1', '0'].includes(state)) {
         return res
             .status(400)
@@ -163,7 +163,7 @@ const controlDevice = async (req, res) => {
     }
 
     try {
-        const feedName = device.toLowerCase().replace(/\s+/g, '-');
+        const feedName = name.toLowerCase().replace(/\s+/g, '-');
         const controlUrl = `${BASE_URL}/${feedName}/data`;
         const response = await axios.post(
             controlUrl,
@@ -172,24 +172,25 @@ const controlDevice = async (req, res) => {
         );
         console.log('response from update light: ', response);
         if (response.status === 200) {
-            console.log('feedName: ', device);
+            console.log('feedName: ', name);
             const updatedDevice = await Device.findOneAndUpdate(
-                { name: device },
+                { name },
                 { status: state, Last_updated: new Date() },
                 { new: true }
             );
+            console.log('updatedDevice: ', updatedDevice);
             if (updatedDevice) {
                 const history = new History({
                     device: updatedDevice._id,
                     user: req.user._id,
-                    message: `${device} turned ${state} by ${req.user.name}`,
+                    message: `${name} turned ${state} by ${req.user.name}`,
                     time: new Date(),
                 });
                 await history.save();
 
                 return res.json({
                     success: true,
-                    message: `${device} turned ${state}`,
+                    message: `${name} turned ${state}`,
                 });
             }
             res.json({
@@ -208,99 +209,4 @@ const controlDevice = async (req, res) => {
     }
 };
 
-/**
- * @swagger
- * /api/devices/auto/{device}:
- *   put:
- *     summary: Set auto mode for device
- *     description: Updates the auto setting for a device and sends it to Adafruit
- *     tags:
- *       - Devices
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: device
- *         required: true
- *         description: Device name to set auto mode
- *         schema:
- *           type: string
- *           example: "Temperature Sensor"
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               auto:
- *                 type: boolean
- *                 example: true
- *     responses:
- *       200:
- *         description: Successfully updated auto mode
- *       400:
- *         description: Invalid device or auto value
- *       500:
- *         description: Failed to update auto mode
- */
-const setAuto = async (req, res) => {
-    const { device } = req.params;
-    const { auto } = req.body; // auto: true/false
-
-    if (typeof auto !== 'boolean') {
-        return res
-            .status(400)
-            .json({ error: 'Invalid value for auto. Must be true or false.' });
-    }
-
-    try {
-        const updatedDevice = await Device.findOneAndUpdate(
-            { name: device },
-            { auto: auto, last_updated: new Date() },
-            { new: true }
-        );
-
-        if (!updatedDevice) {
-            return res.status(400).json({ error: 'Device not found' });
-        }
-
-        const feedName = device.toLowerCase().replace(/\s+/g, '-');
-        const controlUrl = `${BASE_URL}/${feedName}/data`;
-
-        const response = await axios.post(
-            controlUrl,
-            { value: auto ? 1 : 0 },
-            { headers }
-        );
-
-        if (response.status === 200) {
-            // Optionally log the action
-            const history = new History({
-                device: updatedDevice._id,
-                user: req.user._id,
-                message: `${device} auto mode set to ${
-                    auto ? 'enabled' : 'disabled'
-                } by ${req.user.name}`,
-                time: new Date(),
-            });
-            await history.save();
-
-            return res.json({
-                success: true,
-                message: `${device} auto mode set to ${
-                    auto ? 'enabled' : 'disabled'
-                }`,
-            });
-        } else {
-            res.status(500).json({
-                error: 'Failed to send auto setting to Adafruit',
-            });
-        }
-    } catch (error) {
-        console.error('Error setting auto mode:', error.message);
-        res.status(500).json({ error: 'Failed to update auto mode' });
-    }
-};
-
-export { addDevice, controlDevice, getDevices, setAuto };
+export { addDevice, controlDevice, getDevices };
