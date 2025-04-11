@@ -11,7 +11,7 @@ import cookieParser from 'cookie-parser';
 // cronjob for schedule
 import './utils/cronjobForSchedule.js';
 // cronjob for sensorData
-import './utils/cronjobForSensorData.js';
+// import './utils/cronjobForSensorData.js';
 import { errorMiddleWare } from './middleWares/errorMiddleware.middleware.js';
 
 dotenv.config({ path: './../Backend/config/.env' });
