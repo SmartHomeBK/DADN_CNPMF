@@ -12,8 +12,6 @@ cron.schedule('*/5 * * * * *', async () => {
     const now = new Date();
     const currentTime = now.toTimeString().slice(0, 5); // Lấy HH:mm
 
-    // console.log(`Checking schedules for time: ${currentTime}`);
-
     try {
         const schedules = await Schedule.find({
             start_time: currentTime,

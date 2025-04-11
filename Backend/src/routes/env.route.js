@@ -5,6 +5,6 @@ import {
 } from '../controller/envValues.controller.js';
 export const route = Router();
 
-route.get('/humid', getEnvironmentValues);
-route.get('/humid/range', getEnvironmentDataInRange);
+route.get('', getEnvironmentValues);
+route.get('/range', getEnvironmentDataInRange);
 export const EnvRouter = route;
