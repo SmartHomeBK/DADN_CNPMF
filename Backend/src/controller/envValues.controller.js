@@ -160,7 +160,7 @@ const getEnvironmentDataInRange = async (req, res) => {
             .lean();
 
         const humidData = sensorData.filter(
-            (data) => data.sensor.type === 'humidity'
+            (data) => data.sensor.type === 'humid'
         );
         const tempData = sensorData.filter(
             (data) => data.sensor.type === 'temperature'

@@ -9,9 +9,9 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import cookieParser from 'cookie-parser';
 // cronjob for schedule
-// import "./utils/cronjobForSchedule.js';
+import './utils/cronjobForSchedule.js';
 // cronjob for sensorData
-// import './utils/cronjobForSensorData.js";
+import './utils/cronjobForSensorData.js';
 import { errorMiddleWare } from './middleWares/errorMiddleware.middleware.js';
 
 dotenv.config({ path: './../Backend/config/.env' });
@@ -80,7 +80,8 @@ app.use(
     swaggerUi.serve,
     swaggerUi.setup(swaggerDocs, {
         swaggerOptions: {
-            withCredentials: true, // Enable credentials to allow cookies to be sent
+            withCredentials: true,
+            persistAuthorization: true,
         },
     })
 );

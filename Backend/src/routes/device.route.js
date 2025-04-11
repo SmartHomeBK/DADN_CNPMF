@@ -3,7 +3,7 @@ import {
     addDevice,
     controlDevice,
     getDevices,
-    setAuto,
+    updateDeviceSettings,
 } from '../controller/device.controller.js';
 
 const route = Router();
@@ -11,5 +11,5 @@ const route = Router();
 route.get('', getDevices);
 route.post('', addDevice);
 route.put('/control/:device', controlDevice);
-route.put('/api/devices/auto/:device', setAuto);
+route.put('/auto/:id', updateDeviceSettings);
 export const DeviceRoute = route;

@@ -8,7 +8,10 @@ const deviceSchema = new mongoose.Schema(
         location: String,
         max_value: Number,
         min_value: Number,
-        auto: Boolean,
+        auto: {
+            type: Boolean,
+            default: false,
+        },
         last_updated: Date,
     },
     { timestamps: true }

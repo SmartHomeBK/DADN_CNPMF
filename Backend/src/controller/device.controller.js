@@ -69,7 +69,7 @@ const getDevices = async (req, res) => {
  *             properties:
  *               name:
  *                 type: string
- *                 example: "fan"
+ *                 example: "Fan"
  *               type:
  *                 type: string
  *                 example: "temperature"
@@ -79,6 +79,15 @@ const getDevices = async (req, res) => {
  *               location:
  *                 type: string
  *                 example: "Greenhouse"
+ *               max_value:
+ *                 type: number
+ *                 example: 100
+ *               min_value:
+ *                 type: number
+ *                 example: 30
+ *               auto:
+ *                 type: boolean
+ *                 example: false
  *     responses:
  *       201:
  *         description: Successfully created device
@@ -89,10 +98,29 @@ const getDevices = async (req, res) => {
  */
 const addDevice = async (req, res) => {
     try {
-        const { name, type, status, location } = req.body;
+        const { name, type, status, location, max_value, min_value, auto } =
+            req.body;
 
         if (!name || !type || !status || !location) {
-            return res.status(400).json({ error: 'All fields are required' });
+            return res.status(400).json({
+                error: 'Missing required fields: name, type, status, location',
+            });
+        }
+
+        if (max_value !== undefined && typeof max_value !== 'number') {
+            return res
+                .status(400)
+                .json({ error: 'max_value must be a number' });
+        }
+
+        if (min_value !== undefined && typeof min_value !== 'number') {
+            return res
+                .status(400)
+                .json({ error: 'min_value must be a number' });
+        }
+
+        if (auto !== undefined && typeof auto !== 'boolean') {
+            return res.status(400).json({ error: 'auto must be a boolean' });
         }
 
         const newDevice = new Device({
@@ -100,10 +128,14 @@ const addDevice = async (req, res) => {
             type,
             status,
             location,
+            max_value: max_value ?? null,
+            min_value: min_value ?? null,
+            auto: auto ?? false,
             last_updated: new Date(),
         });
 
         await newDevice.save();
+
         res.status(201).json({
             success: true,
             message: 'Device created successfully',
@@ -132,7 +164,7 @@ const addDevice = async (req, res) => {
  *         description: Device name to control
  *         schema:
  *           type: string
- *           example: "Temperature Sensor"
+ *           example: "Fan"
  *     requestBody:
  *       required: true
  *       content:
@@ -209,4 +241,71 @@ const controlDevice = async (req, res) => {
     }
 };
 
-export { addDevice, controlDevice, getDevices };
+/**
+ * @swagger
+ * /api/devices/auto/{id}:
+ *   put:
+ *     summary: Update min, max values and auto mode
+ *     tags: [Devices]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The device ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               min_value:
+ *                 type: number
+ *               max_value:
+ *                 type: number
+ *               auto:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Device updated successfully
+ *       404:
+ *         description: Device not found
+ *       500:
+ *         description: Server error
+ */
+const updateDeviceSettings = async (req, res) => {
+    const { id } = req.params;
+    const { min_value, max_value, auto } = req.body;
+
+    try {
+        const update = {
+            ...(min_value !== undefined && { min_value }),
+            ...(max_value !== undefined && { max_value }),
+            ...(auto !== undefined && { auto }),
+            last_updated: new Date(),
+        };
+
+        const device = await Device.findByIdAndUpdate(id, update, {
+            new: true,
+        });
+
+        if (!device) {
+            return res.status(404).json({ error: 'Device not found' });
+        }
+
+        res.json({
+            success: true,
+            message: 'Device settings updated',
+            device,
+        });
+    } catch (err) {
+        console.error('Error updating device settings:', err.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export { addDevice, controlDevice, getDevices, updateDeviceSettings };
