@@ -6,7 +6,6 @@ import "./../../scss/pages/_Login.scss";
 import { useFormik } from "formik";
 import { notiValidation } from "../../common/notiValidation.js";
 import { axiosInstance } from "../../util/http.js";
-import Cookies from "js-cookie";
 const Login = () => {
   const navigate = useNavigate();
   const { values, errors, handleChange, handleBlur, handleSubmit, touched } =
@@ -19,8 +18,8 @@ const Login = () => {
         try {
           console.log(values);
           const result = await axiosInstance.post("/auth/login", values);
-          const { UserToken } = Cookies.get();
-          localStorage.setItem("UserToken", UserToken);
+          console.log("reuslt: ", result.data.token);
+          localStorage.setItem("UserToken", result.data.token);
           console.log("result from login: ", result);
           setTimeout(() => {
             navigate("/");

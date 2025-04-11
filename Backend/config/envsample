@@ -2,8 +2,8 @@
 
 MONGODB_URI=mongodb+srv://khanhzip14:OiFNmAkSVXYaHy0J@cluster0.jtjqx5p.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 PORT= 8080
-AIO_KEY=aio_tOIi56ccGrmO0jfnoFaEeYXXzmpk
-AIO_USERNAME=Ngocha8751
+AIO_KEY=aio_cRPd22ffcXUokTvO9iLlTkPAvS64
+AIO_USERNAME=Ngocha8752
 JWT_SECRET_KEY=ngocha_depzai
 COOKIE_EXPIRES=7
 NODE_ENV=DEVELOPMENT
