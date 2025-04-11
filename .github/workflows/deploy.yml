@@ -2,7 +2,7 @@ name: CI/CD with Docker Compose to Render
 
 on:
     push:
-        branches: [staging, master]
+        branches: [master]
 
 jobs:
     deploy:
