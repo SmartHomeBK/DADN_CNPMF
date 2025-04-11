@@ -64,7 +64,7 @@ const swaggerOptions = {
         servers: [
             {
                 url:
-                    process.env === 'DEVELOPMENT'
+                    process.env.NODE_ENV === 'DEVELOPMENT'
                         ? `http://localhost:${process.env.PORT}`
                         : 'https://dadn-cnpmf.onrender.com',
             },
