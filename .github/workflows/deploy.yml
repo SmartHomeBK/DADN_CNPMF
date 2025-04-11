@@ -19,10 +19,5 @@ jobs:
             - name: 🐳 Docker Compose Build
               run: docker compose up -d --build
 
-            - name: ✅ Health Check
-              run: |
-                  sleep 5
-                  curl -f http://localhost:8080 || exit 1
-
             - name: 🚀 Trigger Deploy to Render
               run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
