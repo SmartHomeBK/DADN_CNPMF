@@ -1,4 +1,4 @@
-name: CI/CD with Docker Compose + Docker Hub + Render
+name: CI/CD with Docker Compose + Docker Hub + Render   
 
 on:
     push:
