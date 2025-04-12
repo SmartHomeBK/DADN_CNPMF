@@ -1,9 +1,9 @@
-import axios from 'axios';
-import dotenv from 'dotenv';
-import { BASE_URL, headers } from '../../config/adafruit.js';
-import SensorData from '../models/sensorData.model.js';
+import axios from "axios";
+import dotenv from "dotenv";
+import { BASE_URL, headers } from "../../config/adafruit.js";
+import SensorData from "../models/sensorData.model.js";
 
-dotenv.config({ path: './../Backend/config/.env' });
+dotenv.config({ path: "./../Backend/config/.env" });
 
 /**
  * @swagger
@@ -36,25 +36,25 @@ dotenv.config({ path: './../Backend/config/.env' });
  *         description: Failed to fetch environment data
  */
 const getEnvironmentValues = async (req, res) => {
-    try {
-        const [humidRes, tempRes, lightRes] = await Promise.all([
-            axios.get(`${BASE_URL}/humid`, { headers }),
-            axios.get(`${BASE_URL}/temperature`, { headers }),
-            axios.get(`${BASE_URL}/light`, { headers }),
-        ]);
+  try {
+    const [humidRes, tempRes, lightRes] = await Promise.all([
+      axios.get(`${BASE_URL}/humid`, { headers }),
+      axios.get(`${BASE_URL}/temperature`, { headers }),
+      axios.get(`${BASE_URL}/light`, { headers }),
+    ]);
 
-        const { last_value: humid } = humidRes.data;
-        const { last_value: temp } = tempRes.data;
-        const { last_value: light } = lightRes.data;
-        console.log('data from getHumid: ', humid, temp, light);
-        res.json({ humid, temp, light });
-    } catch (error) {
-        console.error(
-            'Error fetching humid data:',
-            error.response ? error.response.data : error.message
-        );
-        res.status(500).json({ error: 'Failed to fetch humid data' });
-    }
+    const { last_value: humid } = humidRes.data;
+    const { last_value: temp } = tempRes.data;
+    const { last_value: light } = lightRes.data;
+    console.log("data from getHumid: ", humid, temp, light);
+    res.json({ humid, temp, light });
+  } catch (error) {
+    console.error(
+      "Error fetching humid data:",
+      error.response ? error.response.data : error.message
+    );
+    res.status(500).json({ error: "Failed to fetch humid data" });
+  }
 };
 
 /**
@@ -111,44 +111,42 @@ const getEnvironmentValues = async (req, res) => {
  *         description: Failed to fetch or store environment data
  */
 const getEnvironmentDataInRange = async (req, res) => {
-    const { startTime, endTime } = req.query;
+  const { startTime, endTime } = req.query;
 
-    try {
-        const startDate = new Date(startTime);
-        const endDate = new Date(endTime);
+  try {
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
 
-        const sensorData = await SensorData.find({
-            recorded_at: { $gte: startDate, $lte: endDate },
-        })
-            .populate('sensor', 'type')
-            .lean();
+    const sensorData = await SensorData.find({
+      recorded_at: { $gte: startDate, $lte: endDate },
+    })
+      .populate("sensor", "type")
+      .lean();
 
-        const humidData = sensorData.filter(
-            (data) => data.sensor.type === 'humidity'
-        );
-        const tempData = sensorData.filter(
-            (data) => data.sensor.type === 'temperature'
-        );
-        const lightData = sensorData.filter(
-            (data) => data.sensor.type === 'light'
-        );
+    const humidData = sensorData.filter(
+      (data) => data.sensor.type === "humidity"
+    );
+    const tempData = sensorData.filter(
+      (data) => data.sensor.type === "temperature"
+    );
+    const lightData = sensorData.filter((data) => data.sensor.type === "light");
 
-        const humidValues = humidData.map((data) => data.value);
-        const tempValues = tempData.map((data) => data.value);
-        const lightValues = lightData.map((data) => data.value);
+    const humidValues = humidData.map((data) => data.value);
+    const tempValues = tempData.map((data) => data.value);
+    const lightValues = lightData.map((data) => data.value);
 
-        res.status(200).json({
-            humid: humidValues,
-            temp: tempValues,
-            light: lightValues,
-        });
-    } catch (error) {
-        console.error(
-            'Error fetching environment data from the database:',
-            error.message
-        );
-        res.status(500).json({ error: 'Failed to fetch environment data' });
-    }
+    res.status(200).json({
+      humid: humidValues,
+      temp: tempValues,
+      light: lightValues,
+    });
+  } catch (error) {
+    console.error(
+      "Error fetching environment data from the database:",
+      error.message
+    );
+    res.status(500).json({ error: "Failed to fetch environment data" });
+  }
 };
 
 export { getEnvironmentValues, getEnvironmentDataInRange };
