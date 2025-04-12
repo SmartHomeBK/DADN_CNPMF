@@ -20,13 +20,13 @@ const HomePage = ({
 
   const fetchData = async () => {
     try {
-      const result = await axiosInstance.get("/env/humid");
+      const result = await axiosInstance.get("/env");
       console.log("result in fetch env data: ", result);
       const { humid, temp, light } = result.data;
       setEnvironmentValues({
-        humid,
-        temperature: temp,
-        light,
+        humid: humid.value,
+        temperature: temp.value,
+        light: light.value,
       });
     } catch (err) {
       console.error("Error fetching data:", err);
