@@ -1,0 +1,31 @@
+name: CI/CD with Docker Compose + Docker Hub + Render
+
+on:
+    push:
+        branches: [master, staging]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: ./Backend
+
+        steps:
+            - name: 📥 Checkout Code
+              uses: actions/checkout@v3
+
+            - name: 🔐 Login to Docker Hub
+              run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+            - name: 🐳 Build & Tag App Image with Compose
+              run: |
+                  docker compose build web
+                  docker tag backend_web:latest ${{ secrets.DOCKERHUB_USERNAME }}/dadn:latest
+
+            - name: 📤 Push Image to Docker Hub
+              run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/dadn:latest
+
+            - name: 🚀 Trigger Deploy to Render
+              run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
