@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 import { BASE_URL, headers } from '../../config/adafruit.js';
 import Sensor from '../models/sensor.model.js';
 import SensorData from '../models/sensorData.model.js';
-
+import Device from '../models/device.model.js';
+import History from '../models/history.model.js';
 dotenv.config();
 
 const fetchAndSaveSensorData = async () => {
@@ -44,8 +45,7 @@ const fetchAndSaveSensorData = async () => {
         if (lightSensor) {
             sensorDataEntries.push({
                 sensor: lightSensor._id,
-                // value: lightValue,
-                value: 50,
+                value: lightValue,
                 recorded_at: timestamp,
             });
         }
@@ -54,6 +54,80 @@ const fetchAndSaveSensorData = async () => {
             await SensorData.insertMany(sensorDataEntries);
             console.log('Sensor data saved to database.');
         }
+
+        const devices = await Device.find({ auto: true });
+
+        devices.forEach(async (device) => {
+            const name = device.name.toLocaleLowerCase();
+
+            if (name === 'fan') {
+                if (tempValue > device.max_value) {
+                    axios.post(
+                        `${BASE_URL}/fan/data`,
+                        { value: 1 },
+                        { headers }
+                    );
+                    await Device.updateOne(
+                        { _id: device._id },
+                        { status: 'on' }
+                    );
+                    await History.create({
+                        device: device._id,
+                        message: `Device ${device.name} turned off due to high temperature (${tempValue}°C)`,
+                        time: timestamp,
+                    });
+                } else if (tempValue < device.min_value) {
+                    axios.post(
+                        `${BASE_URL}/fan/data`,
+                        { value: 0 },
+                        { headers }
+                    );
+                    await Device.updateOne(
+                        { _id: device._id },
+                        { status: 'off' }
+                    );
+                    await History.create({
+                        device: device._id,
+                        message: `Device ${device.name} turned on due to low temperature (${tempValue}°C)`,
+                        time: timestamp,
+                    });
+                }
+            }
+            if (name === 'lightbulb') {
+                if (lightValue < device.min_value) {
+                    axios.post(
+                        `${BASE_URL}/lightbulb/data`,
+                        { value: 1 },
+                        { headers }
+                    );
+
+                    await Device.updateOne(
+                        { _id: device._id },
+                        { status: 'on' }
+                    );
+                    await History.create({
+                        device: device._id,
+                        message: `Device ${device.name} turned on due to low light (${lightValue})`,
+                        time: timestamp,
+                    });
+                } else if (lightValue > device.max_value) {
+                    axios.post(
+                        `${BASE_URL}/lighbulb/data`,
+                        { value: 0 },
+                        { headers }
+                    );
+                    await Device.updateOne(
+                        { _id: device._id },
+                        { status: 'off' }
+                    );
+                    await History.create({
+                        device: device._id,
+                        message: `Device ${device.name} turned off due to high light (${lightValue})`,
+                        time: timestamp,
+                    });
+                }
+            }
+        });
     } catch (error) {
         console.error('Error fetching or saving sensor data:', error.message);
     }

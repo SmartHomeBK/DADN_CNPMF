@@ -5,9 +5,11 @@ import SensorData from "../models/sensorData.model.js";
 
 dotenv.config({ path: "./../Backend/config/.env" });
 
+import Sensor from "../models/sensor.model.js";
+
 /**
  * @swagger
- * /api/env/humid:
+ * /api/env:
  *   get:
  *     summary: Get environment values (humidity, temperature, light)
  *     description: Fetches the latest humidity, temperature, and light values from Adafruit IO.
@@ -37,6 +39,10 @@ dotenv.config({ path: "./../Backend/config/.env" });
  */
 const getEnvironmentValues = async (req, res) => {
   try {
+    const humidSensor = await Sensor.findOne({ type: "humidity" });
+    const tempSensor = await Sensor.findOne({ type: "temperature" });
+    const lightSensor = await Sensor.findOne({ type: "light" });
+
     const [humidRes, tempRes, lightRes] = await Promise.all([
       axios.get(`${BASE_URL}/humid`, { headers }),
       axios.get(`${BASE_URL}/temperature`, { headers }),
@@ -46,20 +52,48 @@ const getEnvironmentValues = async (req, res) => {
     const { last_value: humid } = humidRes.data;
     const { last_value: temp } = tempRes.data;
     const { last_value: light } = lightRes.data;
-    console.log("data from getHumid: ", humid, temp, light);
-    res.json({ humid, temp, light });
+
+    const result = {};
+
+    result.humid = {
+      value: humid,
+      outOfRange:
+        humidSensor?.min_value && humidSensor?.max_value
+          ? humid < humidSensor.min_value || humid > humidSensor.max_value
+          : null,
+    };
+
+    result.temp = {
+      value: temp,
+      outOfRange:
+        tempSensor?.min_value && tempSensor?.max_value
+          ? temp < tempSensor.min_value || temp > tempSensor.max_value
+          : null,
+    };
+
+    result.light = {
+      value: light,
+      outOfRange:
+        lightSensor?.min_value && lightSensor?.max_value
+          ? light < lightSensor.min_value || light > lightSensor.max_value
+          : null,
+    };
+
+    console.log("Fetched and checked data: ", result);
+
+    res.json(result);
   } catch (error) {
     console.error(
-      "Error fetching humid data:",
+      "Error fetching environment data:",
       error.response ? error.response.data : error.message
     );
-    res.status(500).json({ error: "Failed to fetch humid data" });
+    res.status(500).json({ error: "Failed to fetch environment data" });
   }
 };
 
 /**
  * @swagger
- * /api/env/humid/range:
+ * /api/env/range:
  *   get:
  *     summary: Get environment values (humidity, temperature, light) for a time range from the database
  *     description: Fetches the humidity, temperature, and light values for the specified time range from the database.
@@ -123,9 +157,7 @@ const getEnvironmentDataInRange = async (req, res) => {
       .populate("sensor", "type")
       .lean();
 
-    const humidData = sensorData.filter(
-      (data) => data.sensor.type === "humidity"
-    );
+    const humidData = sensorData.filter((data) => data.sensor.type === "humid");
     const tempData = sensorData.filter(
       (data) => data.sensor.type === "temperature"
     );
