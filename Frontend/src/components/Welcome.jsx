@@ -1,44 +1,6 @@
-import axios from "axios";
-import { BellRing, User } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { axiosInstance } from "../../util/http.js";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 
-const HomePage = ({
-  date = "21 Feb 2023",
-  weather = "Sunny",
-  temperature = 31,
-  humidity = 6,
-  lightIntensity = 334,
-}) => {
-  const [environmentValues, setEnvironmentValues] = useState({
-    humid: "",
-    temperature: "",
-    light: "",
-  });
-  const navigate = useNavigate();
-
-  const fetchData = async () => {
-    try {
-      const result = await axiosInstance.get("/env");
-      console.log("result in fetch env data: ", result);
-      const { humid, temp, light } = result.data;
-      setEnvironmentValues({
-        humid: humid.value,
-        temperature: temp.value,
-        light: light.value,
-      });
-    } catch (err) {
-      console.error("Error fetching data:", err);
-    }
-  };
-  useEffect(() => {
-    fetchData();
-    const intervalID = setInterval(fetchData, 10000); // Gọi lại mỗi 10 giây
-
-    // Dọn dẹp interval khi component unmount
-    return () => clearInterval(intervalID);
-  }, []);
+const Welcome = () => {
   return (
     <div className="w-full">
       {/* Weather Widget */}
@@ -111,4 +73,4 @@ const HomePage = ({
   );
 };
 
-export default HomePage;
+export default Welcome;

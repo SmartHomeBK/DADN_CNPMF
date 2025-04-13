@@ -8,12 +8,19 @@ import HumidityDetails from "../pages/HumidityDetails.jsx";
 import LightIntensityDetails from "../pages/LightIntensityDetails.jsx";
 import ControlDevices from "../pages/ControlDevices.jsx";
 import Scheduler from "../pages/Scheduler.jsx";
+import HomeTemplate from "../templates/HomeTemplate.jsx";
 
 const customRoute = () => {
   let route = useRoutes([
     {
       path: "/",
-      element: <HomePage />,
+      element: <HomeTemplate />,
+      children: [
+        {
+          index: true,
+          element: <HomePage />,
+        },
+      ],
     },
     {
       path: "/login",
