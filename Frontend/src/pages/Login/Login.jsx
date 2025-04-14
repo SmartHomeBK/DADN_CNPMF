@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CustomInput from "../../hooks/customInput.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
@@ -6,8 +6,14 @@ import "./../../scss/pages/_Login.scss";
 import { useFormik } from "formik";
 import { notiValidation } from "../../common/notiValidation.js";
 import { axiosInstance } from "../../util/http.js";
+import { useDispatch } from "react-redux";
+import { setIsAuth, setUser } from "../../redux/authSlice.js";
+import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
   const { values, errors, handleChange, handleBlur, handleSubmit, touched } =
     useFormik({
       initialValues: {
@@ -18,13 +24,16 @@ const Login = () => {
         try {
           console.log(values);
           const result = await axiosInstance.post("/auth/login", values);
-          console.log("reuslt: ", result.data.token);
+          toast.success("Login SuccessFully!");
           localStorage.setItem("UserToken", result.data.token);
           console.log("result from login: ", result);
+          dispatch(setIsAuth(true));
+          dispatch(setUser(result.data.user));
           setTimeout(() => {
             navigate("/");
           }, 2000);
         } catch (error) {
+          toast.error(error.response.data.message);
           console.log("error in login: ", error);
         }
       },
@@ -45,7 +54,7 @@ const Login = () => {
     });
 
   return (
-    <div className="login">
+    <div className="login flex justify-center items-center">
       <div className="container">
         <div className="login_content w-[1400px] mx-auto">
           <div className="login_title text-center mb-8">
@@ -78,17 +87,29 @@ const Login = () => {
                       onBlur={handleBlur}
                       touched={touched.email}
                     />
-                    <CustomInput
-                      placeholder={"Your password ..."}
-                      name={"password"}
-                      classWrapper="w-[323px] h-[55px]"
-                      value={values.password}
-                      onChange={handleChange}
-                      type="password"
-                      error={errors.password}
-                      onBlur={handleBlur}
-                      touched={touched.password}
-                    />
+                    <div className="relative">
+                      <CustomInput
+                        placeholder={"Your password ..."}
+                        name={"password"}
+                        classWrapper="w-[323px] h-[55px]"
+                        value={values.password}
+                        onChange={handleChange}
+                        type={showPassword ? "text" : "password"}
+                        error={errors.password}
+                        onBlur={handleBlur}
+                        touched={touched.password}
+                      />
+                      <button
+                        className="absolute top-6 right-5"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="text-gray-300" />
+                        ) : (
+                          <Eye className="text-gray-300" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div className="login_button text-center mt-14 ">
                     <button

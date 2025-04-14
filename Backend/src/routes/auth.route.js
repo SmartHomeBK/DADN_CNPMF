@@ -1,8 +1,15 @@
-import { Router } from 'express';
-import { login, SignUp } from '../controller/auth.controller.js';
+import { Router } from "express";
+import {
+  checkAuth,
+  login,
+  logOut,
+  SignUp,
+} from "../controller/auth.controller.js";
+import { isUserAuthenticatedByBearer } from "../middleWares/verifyTokenByBearer.middleware.js";
 
 const route = Router();
-
-route.post('/login', login);
-route.post('/signup', SignUp);
+route.get("/check-auth", isUserAuthenticatedByBearer, checkAuth);
+route.post("/login", login);
+route.post("/signup", SignUp);
+route.get("/logout", logOut);
 export const AuthRouter = route;

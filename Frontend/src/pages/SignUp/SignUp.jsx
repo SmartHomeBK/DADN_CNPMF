@@ -47,7 +47,7 @@ const SignUp = () => {
     });
 
   return (
-    <div className="login">
+    <div className="login flex justify-center items-center">
       <div className="container">
         <div className="login_content w-[1400px] mx-auto">
           <div className="login_title text-center mb-8">

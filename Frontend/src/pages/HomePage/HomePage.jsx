@@ -32,6 +32,7 @@ const HomePage = ({
       console.error("Error fetching data:", err);
     }
   };
+  console.log("bạn đang trong homepage!!!");
   useEffect(() => {
     fetchData();
     const intervalID = setInterval(fetchData, 10000); // Gọi lại mỗi 10 giây
