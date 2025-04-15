@@ -12,6 +12,6 @@ const route = Router();
 route.get("", getDevices);
 route.post("/add", addDevice);
 route.post("/delete", deleteDevice);
-route.put("/control/:device", controlDevice);
+route.put("/control/:name", controlDevice);
 route.put("/auto/:id", updateDeviceSettings);
 export const DeviceRoute = route;

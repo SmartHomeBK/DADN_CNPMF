@@ -232,12 +232,15 @@ const ControlDevices = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (_, { status }) => (
+      render: (_, record, index) => (
         <Space direction="vertical">
           <Switch
             checkedChildren={"ON"}
             unCheckedChildren={"OFF"}
-            checked={status == "1" ? true : false}
+            checked={record.status == "1" ? true : false}
+            onChange={(checked) =>
+              handleUpdateStatus(checked, record.name, index, record._id)
+            }
           />
         </Space>
       ),
@@ -256,20 +259,26 @@ const ControlDevices = () => {
           setUpdateMax({ [record.name]: false });
         },
       }),
-      render: (_, record) => {
+      render: (_, record, index) => {
         // Đảm bảo rằng key là duy nhất cho mỗi phần tử
         return updateMax[record.name] ? (
-          <input
-            value={
-              maxValueUpdated[record.name] != undefined
-                ? maxValueUpdated[record.name]
-                : record.max_value
+          <form
+            onSubmit={(e) =>
+              handleSubmitInput(e, record.name, "MAX", record._id, index)
             }
-            className="w-8 text-center"
-            onChange={(e) =>
-              setMaxValueUpdated({ [record.name]: e.target.value })
-            }
-          />
+          >
+            <input
+              value={
+                maxValueUpdated[record.name] != undefined
+                  ? maxValueUpdated[record.name]
+                  : record.max_value
+              }
+              className="w-8 text-center"
+              onChange={(e) =>
+                setMaxValueUpdated({ [record.name]: e.target.value })
+              }
+            />
+          </form>
         ) : (
           <span>{record.max_value}</span> // Thêm key duy nhất cho span
         );
@@ -288,20 +297,26 @@ const ControlDevices = () => {
           setUpdateMin({ [record.name]: false });
         },
       }),
-      render: (_, record) => {
+      render: (_, record, index) => {
         // Đảm bảo rằng key là duy nhất cho mỗi phần tử
         return updateMin[record.name] ? (
-          <input
-            value={
-              minValueUpdated[record.name] != undefined
-                ? minValueUpdated[record.name]
-                : record.min_value
+          <form
+            onSubmit={(e) =>
+              handleSubmitInput(e, record.name, "MIN", record._id, index)
             }
-            className="w-8 text-center"
-            onChange={(e) =>
-              setMinValueUpdated({ [record.name]: e.target.value })
-            }
-          />
+          >
+            <input
+              value={
+                minValueUpdated[record.name] != undefined
+                  ? minValueUpdated[record.name]
+                  : record.min_value
+              }
+              className="w-8 text-center"
+              onChange={(e) =>
+                setMinValueUpdated({ [record.name]: e.target.value })
+              }
+            />
+          </form>
         ) : (
           <span>{record.min_value}</span> // Thêm key duy nhất cho span
         );
@@ -317,6 +332,7 @@ const ControlDevices = () => {
             checkedChildren={"ON"}
             unCheckedChildren={"OFF"}
             checked={record.auto}
+            onChange={(checked) => handleUpdateAuto(checked, record._id, index)}
           />
         </Space>
       ),
@@ -340,6 +356,51 @@ const ControlDevices = () => {
     fetchDevices();
   }, []);
 
+  const handleUpdateStatus = async (checked, name, index, _id) => {
+    try {
+      console.log("indexsshdsjdhsjd: ", index);
+      const updated = await axiosInstance.put(`/devices/control/${name}`, {
+        state: checked ? "1" : "0",
+      });
+      console.log("update Status successfully: ", updated);
+      let newData = [...devices];
+      newData[index].status = checked ? "1" : "0";
+      setDevices(newData);
+    } catch (error) {
+      console.log("bug in 363: ", error);
+    }
+  };
+  const handleUpdateAuto = async (checked, _id, index) => {
+    try {
+      const updated = await axiosInstance.put(`/devices/auto/${_id}`, {
+        auto: checked ? true : false,
+      });
+      let newData = [...devices];
+      newData[index] = { ...updated.data.device, key: _id };
+      setDevices(newData);
+      console.log("update Auto successfully: ", updated);
+    } catch (error) {
+      console.log("bug in 379: ", error);
+    }
+  };
+  const handleSubmitInput = async (e, name, type, _id, index) => {
+    try {
+      e.preventDefault();
+      let update = {};
+
+      type === "MIN"
+        ? (update["min_value"] = minValueUpdated[name])
+        : (update["max_value"] = maxValueUpdated[name]);
+      const result = await axiosInstance.put(`/devices/auto/${_id}`, update);
+      const newDeviceArray = [...devices];
+      newDeviceArray[index] = { ...result.data.device, key: _id };
+      setDevices(newDeviceArray);
+      type === "MIN" ? setUpdateMin(false) : setUpdateMax(false);
+      console.log("result in handleSubmitInput: ", result);
+    } catch (error) {
+      console.log("error in handleSubmitInput: ", error);
+    }
+  };
   const handleAddDevice = async (newDevice) => {
     try {
       const newDeviceArray = await axiosInstance.post(
@@ -370,11 +431,6 @@ const ControlDevices = () => {
       console.log("error: ", error);
     }
   };
-  const handleToggleDevice = (index) => {
-    const newDevices = [...devices];
-    newDevices[index].state = !newDevices[index].state;
-    setDevices(newDevices);
-  };
 
   const handleDeleteDevice = async (_id) => {
     try {
@@ -389,7 +445,7 @@ const ControlDevices = () => {
       console.log("error in handleDeleteDevice: ", error);
     }
   };
-
+  const handleUpdate_Min_Max_Auto = async () => {};
   return (
     <div className="w-full min-h-screen bg-white">
       {/* Top Navigation Bar */}

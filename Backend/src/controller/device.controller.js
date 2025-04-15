@@ -100,31 +100,20 @@ const addDevice = async (req, res) => {
   try {
     const { name, type, status, location, max_value, min_value, auto } =
       req.body;
-    if (name) {
-      const existedDevice = await Device.findOne({ name });
-      if (existedDevice)
-        return res.status(400).json({
-          status: "error",
-          message: `${name} đã tồn tại`,
-        });
-    }
+
     if (!name || !type || !status || !location) {
       return res.status(400).json({
         error: "Missing required fields: name, type, status, location",
       });
     }
 
-    // if (max_value !== undefined && typeof max_value !== 'number') {
-    //     return res
-    //         .status(400)
-    //         .json({ error: 'max_value must be a number' });
-    // }
+    if (max_value !== undefined && typeof max_value !== "number") {
+      return res.status(400).json({ error: "max_value must be a number" });
+    }
 
-    // if (min_value !== undefined && typeof min_value !== 'number') {
-    //     return res
-    //         .status(400)
-    //         .json({ error: 'min_value must be a number' });
-    // }
+    if (min_value !== undefined && typeof min_value !== "number") {
+      return res.status(400).json({ error: "min_value must be a number" });
+    }
 
     if (auto !== undefined && typeof auto !== "boolean") {
       return res.status(400).json({ error: "auto must be a boolean" });
@@ -135,8 +124,8 @@ const addDevice = async (req, res) => {
       type,
       status,
       location,
-      max_value: max_value,
-      min_value: min_value,
+      max_value: max_value ?? null,
+      min_value: min_value ?? null,
       auto: auto ?? false,
       last_updated: new Date(),
     });
@@ -312,7 +301,6 @@ const updateDeviceSettings = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 const deleteDevice = async (req, res) => {
   try {
     const { _id } = req.body;
