@@ -49,6 +49,10 @@ const customRoute = () => {
           path: "user-infor",
           element: <UserInformation />,
         },
+        {
+          path: "control-devices",
+          element: <ControlDevices />,
+        },
       ],
     },
     {
@@ -75,10 +79,7 @@ const customRoute = () => {
       path: "/light-intensity-details",
       element: <LightIntensityDetails />,
     },
-    {
-      path: "/control-devices",
-      element: <ControlDevices />,
-    },
+
     {
       path: "/scheduler",
       element: <Scheduler />,

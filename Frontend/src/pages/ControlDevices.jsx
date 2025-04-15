@@ -370,6 +370,7 @@ const ControlDevices = () => {
       console.log("bug in 363: ", error);
     }
   };
+
   const handleUpdateAuto = async (checked, _id, index) => {
     try {
       const updated = await axiosInstance.put(`/devices/auto/${_id}`, {
@@ -383,6 +384,7 @@ const ControlDevices = () => {
       console.log("bug in 379: ", error);
     }
   };
+
   const handleSubmitInput = async (e, name, type, _id, index) => {
     try {
       e.preventDefault();
@@ -401,6 +403,7 @@ const ControlDevices = () => {
       console.log("error in handleSubmitInput: ", error);
     }
   };
+
   const handleAddDevice = async (newDevice) => {
     try {
       const newDeviceArray = await axiosInstance.post(
@@ -416,6 +419,7 @@ const ControlDevices = () => {
       console.log("error in addDevice: ", error);
     }
   };
+
   const fetchDevices = async () => {
     try {
       const res = await axiosInstance.get("/devices");
@@ -445,78 +449,24 @@ const ControlDevices = () => {
       console.log("error in handleDeleteDevice: ", error);
     }
   };
-  const handleUpdate_Min_Max_Auto = async () => {};
+
   return (
-    <div className="w-full min-h-screen bg-white">
-      {/* Top Navigation Bar */}
-      <div className="w-full h-[104px] bg-[#d09696] flex justify-between items-center px-8">
-        <div className="w-[158px] h-[158px] relative top-[2.5rem]">
-          <img
-            src="https://dashboard.codeparrot.ai/api/image/Z9kVsJIdzXb5OlZt/mask-gro.png"
-            alt="Smart Home Logo"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex gap-6">
-          <button className="w-10 h-10 hover:opacity-80 transition-opacity">
-            <BellRing className="w-8 h-8" />
-          </button>
-          <button className="w-10 h-10 hover:opacity-80 transition-opacity bg-slate-100 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8" />
+    <div className="w-full">
+      <div className="w-full p-8">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="font-['Italianno'] text-[70px] text-black">
+            Control Devices
+          </h1>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Add Device
           </button>
         </div>
-      </div>
 
-      {/* Sidebar */}
-      <div className="flex">
-        <div className="left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
-          <div className="px-5 pt-[100px]">
-            <button
-              onClick={() => navigate("/")}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors"
-            >
-              <span className="font-inter text-base text-[#21255a]">Home</span>
-            </button>
-            <button
-              onClick={() => navigate("/statistics")}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Statistic values
-              </span>
-            </button>
-            <button className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4">
-              <span className="font-inter text-base text-[#21255a]">
-                Control Devices
-              </span>
-            </button>
-            <button
-              onClick={() => navigate("/scheduler")}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Scheduler
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="w-full p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="font-['Italianno'] text-[70px] text-black">
-              Control Devices
-            </h1>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Add Device
-            </button>
-          </div>
-
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {devices.map((device, index) => (
               <DeviceCard
                 key={device.id}
@@ -526,10 +476,8 @@ const ControlDevices = () => {
               />
             ))}
           </div> */}
-          <Table columns={columns} dataSource={devices} />
-        </div>
+        <Table columns={columns} dataSource={devices} />
       </div>
-
       <AddDeviceModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
