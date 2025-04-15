@@ -35,10 +35,7 @@ const customRoute = () => {
     checkAuth();
   }, []);
   console.log("bạn đang trong customeRoute");
-  if (isCheckingAuth) {
-    // 👇 tạm render gì đó nhẹ nhàng trong lúc chờ
-    return <HomeTemplate />;
-  }
+
   let route = useRoutes([
     {
       path: "/",
@@ -87,6 +84,10 @@ const customRoute = () => {
       element: <Scheduler />,
     },
   ]);
+  if (isCheckingAuth) {
+    // 👇 tạm render gì đó nhẹ nhàng trong lúc chờ
+    return <HomeTemplate />;
+  }
   return route;
 };
 
