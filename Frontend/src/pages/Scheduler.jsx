@@ -58,6 +58,11 @@ const ScheduleCard = ({ schedule, onDelete }) => {
   );
 };
 
+const deviceNames = [
+  "Light",
+  "Fan",
+];
+
 const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
   const [schedule, setSchedule] = useState({
     deviceName: '',
@@ -102,7 +107,11 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                 <option value="" disabled>
                   Select a device
                 </option>
-                {/* Call API */}
+                {deviceNames.map((name, index) => (
+                  <option key={index} value={name}>
+                    {name}
+                  </option>
+                ))}
               </select>
             </div>
 
