@@ -5,6 +5,11 @@ import { axiosInstance } from "../util/http.js";
 import { Space, Table, Switch, Row, Col, Slider, InputNumber } from "antd";
 import { toast } from "react-hot-toast";
 
+const deviceNames = [
+  "Light",
+  "Fan",
+];
+
 const AddDeviceModal = ({ isOpen, onClose, onAdd }) => {
   const [deviceName, setDeviceName] = useState("");
   const [deviceType, setDeviceType] = useState("light");
@@ -74,7 +79,11 @@ const AddDeviceModal = ({ isOpen, onClose, onAdd }) => {
                 <option value="" disabled>
                   Select a device
                 </option>
-                {/* Call API Get */}
+                {deviceNames.map((name, index) => (
+                  <option key={index} value={name}>
+                    {name}
+                  </option>
+                ))}
               </select>
             </div>
 
