@@ -1,27 +1,28 @@
 import { BellRing, Loader, User } from "lucide-react";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Dropdown, Modal, Space } from "antd";
 import { axiosInstance } from "../util/http.js";
 import { setIsAuth } from "../redux/authSlice.js";
+
 const HomeTemplate = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation(); // Get current pathname
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState("Are you sure to logout ?");
+  const [modalText, setModalText] = useState("Are you sure to logout?");
+
   const showModal = () => {
     setOpen(true);
   };
+
   const items = [
     {
       key: "1",
       label: (
-        <Link
-          // href="https://www.antgroup.com"
-          to={"/user-infor"}
-        >
+        <Link to={"/user-infor"}>
           My Account
         </Link>
       ),
@@ -30,9 +31,6 @@ const HomeTemplate = () => {
       key: "2",
       label: (
         <a
-          target="_blank"
-          rel="noopener noreferrer"
-          // href="https://www.aliyun.com"
           type="primary"
           onClick={showModal}
         >
@@ -43,22 +41,30 @@ const HomeTemplate = () => {
   ];
 
   const handleOk = async () => {
-    const res = await axiosInstance.get("/auth/logout");
-    console.log("res from logout in handleOK in Hometemplate!!!: ", res);
-    dispatch(setIsAuth(false));
-    setModalText("The modal will be closed after two seconds");
-    setConfirmLoading(true);
-    localStorage.removeItem("UserToken");
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-    }, 2000);
+    try {
+      const res = await axiosInstance.get("/auth/logout");
+      console.log("Logout response:", res);
+      dispatch(setIsAuth(false));
+      setModalText("The modal will be closed after two seconds");
+      setConfirmLoading(true);
+      localStorage.removeItem("UserToken");
+      setTimeout(() => {
+        setOpen(false);
+        setConfirmLoading(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
+
   const handleCancel = () => {
     console.log("Clicked cancel button");
     setOpen(false);
   };
+
   const { isCheckingAuth, isAuth } = useSelector((state) => state.auth);
+
+  const isActive = (path) => location.pathname === path;
 
   if (isCheckingAuth && !isAuth) {
     return (
@@ -72,7 +78,7 @@ const HomeTemplate = () => {
             <img
               src="https://dashboard.codeparrot.ai/api/image/Z9kVsJIdzXb5OlZt/mask-gro.png"
               alt="Smart Home Logo"
-              className="w-full h-full object-cover "
+              className="w-full h-full object-cover"
             />
           </div>
           <div className="flex gap-6">
@@ -86,33 +92,44 @@ const HomeTemplate = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="flex ">
-          <div className=" left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
+        <div className="flex">
+          <div className="left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
             <div className="px-5 pt-[100px]">
-              <button className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors">
+              <button
+                className={`w-[187px] h-[65px] rounded-2xl transition-colors ${
+                  isActive("/") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                }`}
+                onClick={() => navigate("/")}
+              >
                 <span className="font-inter text-base text-[#21255a]">
                   Home
                 </span>
               </button>
               <button
+                className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
+                  isActive("/statistics") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                }`}
                 onClick={() => navigate("/statistics")}
-                className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
               >
                 <span className="font-inter text-base text-[#21255a]">
                   Statistic values
                 </span>
               </button>
               <button
+                className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
+                  isActive("/control-devices") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                }`}
                 onClick={() => navigate("/control-devices")}
-                className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
               >
                 <span className="font-inter text-base text-[#21255a]">
                   Control Devices
                 </span>
               </button>
               <button
+                className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
+                  isActive("/scheduler") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                }`}
                 onClick={() => navigate("/scheduler")}
-                className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
               >
                 <span className="font-inter text-base text-[#21255a]">
                   Scheduler
@@ -129,6 +146,7 @@ const HomeTemplate = () => {
       </div>
     );
   }
+
   return (
     <div className="w-full min-h-screen bg-white">
       {/* Top Navigation Bar */}
@@ -140,7 +158,7 @@ const HomeTemplate = () => {
           <img
             src="https://dashboard.codeparrot.ai/api/image/Z9kVsJIdzXb5OlZt/mask-gro.png"
             alt="Smart Home Logo"
-            className="w-full h-full object-cover "
+            className="w-full h-full object-cover"
           />
         </div>
         <div className="flex gap-6 mr-5">
@@ -150,8 +168,7 @@ const HomeTemplate = () => {
           <Space direction="vertical">
             <Space wrap>
               <Dropdown menu={{ items }} placement="bottom" arrow>
-                <button className="w-10 h-10  bg-slate-100 rounded-full flex items-center justify-center">
-                  {" "}
+                <button className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
                   <User className="w-8 h-8" />
                 </button>
               </Dropdown>
@@ -161,31 +178,44 @@ const HomeTemplate = () => {
       </div>
 
       {/* Sidebar */}
-      <div className="flex ">
-        <div className=" left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
+      <div className="flex">
+        <div className="left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
           <div className="px-5 pt-[100px]">
-            <button className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors">
-              <span className="font-inter text-base text-[#21255a]">Home</span>
+            <button
+              className={`w-[187px] h-[65px] rounded-2xl transition-colors ${
+                isActive("/") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+              }`}
+              onClick={() => navigate("/")}
+            >
+              <span className="font-inter text-base text-[#21255a]">
+                Home
+              </span>
             </button>
             <button
+              className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
+                isActive("/statistics") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+              }`}
               onClick={() => navigate("/statistics")}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
             >
               <span className="font-inter text-base text-[#21255a]">
                 Statistic values
               </span>
             </button>
             <button
+              className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
+                isActive("/control-devices") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+              }`}
               onClick={() => navigate("/control-devices")}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
             >
               <span className="font-inter text-base text-[#21255a]">
                 Control Devices
               </span>
             </button>
             <button
+              className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
+                isActive("/scheduler") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+              }`}
               onClick={() => navigate("/scheduler")}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
             >
               <span className="font-inter text-base text-[#21255a]">
                 Scheduler
@@ -194,11 +224,13 @@ const HomeTemplate = () => {
           </div>
         </div>
         <Modal
-          title="Log out"
+          title="Logout"
           open={open}
           onOk={handleOk}
           confirmLoading={confirmLoading}
           onCancel={handleCancel}
+          okText="Confirm"
+          cancelText="Cancel"
         >
           <p>{modalText}</p>
         </Modal>
