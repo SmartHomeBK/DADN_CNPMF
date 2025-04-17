@@ -11,7 +11,7 @@ const scheduleSchema = new mongoose.Schema({
         required: true,
         match: /^([01]\d|2[0-3]):([0-5]\d)$/,
     }, // HH:mm
-    action: String,
+    action: Boolean,
 });
 scheduleSchema.index({ device: 1, start_time: 1 }, { unique: true });
 

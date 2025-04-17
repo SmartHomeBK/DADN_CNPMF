@@ -155,10 +155,10 @@ const getSchedulesByDeviceName = async (req, res) => {
  *                 description: The time when the action will be triggered, in HH:mm format
  *                 example: "12:00"
  *               action:
- *                 type: string
+ *                 type: boolean
  *                 enum: [on, off]
  *                 description: The action to perform (turn the device on or off)
- *                 example: "on"
+ *                 example: true
  *     responses:
  *       201:
  *         description: Schedule created successfully and device updated on Adafruit IO
@@ -184,8 +184,8 @@ const getSchedulesByDeviceName = async (req, res) => {
  *                       format: HH:mm
  *                       example: "12:00"
  *                     action:
- *                       type: string
- *                       example: "on"
+ *                       type: boolean
+ *                       example: true
  *       400:
  *         description: Bad request, missing required fields
  *       404:
@@ -205,7 +205,10 @@ const setSchedule = async (req, res) => {
         if (!device) {
             return res.status(404).json({ error: 'Device not found' });
         }
-        const oldSchedule = await Schedule.findOne({ start_time });
+        const oldSchedule = await Schedule.findOne({
+            device: deviceId,
+            start_time,
+        });
         if (oldSchedule) {
             return res.status(400).json({ error: 'Schedule already exists' });
         }
