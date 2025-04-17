@@ -58,6 +58,11 @@ const ScheduleCard = ({ schedule, onDelete }) => {
   );
 };
 
+const deviceNames = [
+  "Light",
+  "Fan",
+];
+
 const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
   const [schedule, setSchedule] = useState({
     deviceName: '',
@@ -93,14 +98,21 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Device Name
               </label>
-              <input
-                type="text"
+              <select
                 value={schedule.deviceName}
                 onChange={(e) => setSchedule({ ...schedule, deviceName: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter device name"
                 required
-              />
+              >
+                <option value="" disabled>
+                  Select a device
+                </option>
+                {deviceNames.map((name, index) => (
+                  <option key={index} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -113,7 +125,7 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="light">Light</option>
-                <option value="fan">Fan</option>
+                <option value="tempurature">Tempurature</option>
               </select>
             </div>
 
