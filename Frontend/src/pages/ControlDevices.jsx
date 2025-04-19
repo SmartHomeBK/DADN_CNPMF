@@ -27,7 +27,7 @@ const AddDeviceModal = ({ isOpen, onClose, onAdd }) => {
   };
 
   const handleChange = (e) => {
-    const { value, name } = e.target;
+    let { value, name } = e.target;
     if (name == "auto") value = value == "1" ? true : false;
     setNewDivice((prev) => ({ ...prev, [name]: value }));
   };
