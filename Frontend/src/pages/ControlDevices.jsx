@@ -5,7 +5,7 @@ import { axiosInstance } from "../util/http.js";
 import { Space, Table, Switch, Row, Col, Slider, InputNumber } from "antd";
 import { toast } from "react-hot-toast";
 
-const deviceNames = ["lightBulb", "fan"];
+const deviceNames = ["LightBulb", "Fan"];
 
 const AddDeviceModal = ({ isOpen, onClose, onAdd }) => {
   const [deviceName, setDeviceName] = useState("");
