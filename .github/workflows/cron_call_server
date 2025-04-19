@@ -1,0 +1,19 @@
+name: ⏱️ Ping Server Cron Job
+
+on:
+  schedule:
+    # Chạy mỗi 10 phút
+    - cron: '*/10 * * * *'
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📡 Send POST request to /auth/login
+        run: |
+          echo "Calling /auth/login at $(date)"
+          curl -s -o /dev/null -w "%{http_code}" \
+            -X POST https://smart-home-iot-backend.onrender.com/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"email":"your_email@example.com","password":"your_password"}'
