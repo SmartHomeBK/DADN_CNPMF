@@ -3,6 +3,7 @@ import { BellRing, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../util/http.js";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const HomePage = ({
   date = "21 Feb 2023",
@@ -27,6 +28,14 @@ const HomePage = ({
         humid: humid.value,
         temperature: temp.value,
         light: light.value,
+      });
+      const objectEnv = result.data;
+      Object.keys(objectEnv).forEach((key) => {
+        if (
+          objectEnv[key].outOfRange != null &&
+          objectEnv[key].outOfRange !== "NO"
+        )
+          toast.error(objectEnv[key].outOfRange);
       });
     } catch (err) {
       console.error("Error fetching data:", err);
