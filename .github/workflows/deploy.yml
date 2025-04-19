@@ -1,8 +1,13 @@
-name: CI/CD with Docker Compose + Docker Hub + Render   
+name: CI/CD with Docker Compose + Docker Hub + Render
 
 on:
+    # Trigger on push to master or staging
     push:
         branches: [master, staging]
+    
+    # Schedule cron job to run every hour
+    schedule:
+        - cron: '0 * * * *' # Runs every hour on the hour
 
 jobs:
     deploy:
