@@ -37,6 +37,13 @@ import Sensor from "../models/sensor.model.js";
  *       500:
  *         description: Failed to fetch environment data
  */
+
+const raiseOutOfRange = (type, cur_val, min_val, max_val) => {
+  if (cur_val < min_val)
+    return `Current ${type} value ${cur_val} is under allowed min value: ${min_val}`;
+  else if (cur_val > max_val)
+    return `Current ${type} value ${cur_val} is higher allowed max value: ${max_val}`;
+};
 const getEnvironmentValues = async (req, res) => {
   try {
     const humidSensor = await Sensor.findOne({ type: "humidity" });
@@ -60,6 +67,13 @@ const getEnvironmentValues = async (req, res) => {
       outOfRange:
         humidSensor?.min_value && humidSensor?.max_value
           ? humid < humidSensor.min_value || humid > humidSensor.max_value
+            ? raiseOutOfRange(
+                "humid",
+                humid,
+                humidSensor.min_value,
+                humidSensor.max_value
+              )
+            : "NO"
           : null,
     };
 
@@ -68,6 +82,13 @@ const getEnvironmentValues = async (req, res) => {
       outOfRange:
         tempSensor?.min_value && tempSensor?.max_value
           ? temp < tempSensor.min_value || temp > tempSensor.max_value
+            ? raiseOutOfRange(
+                "temperature",
+                temp,
+                tempSensor.min_value,
+                tempSensor.max_value
+              )
+            : "NO"
           : null,
     };
 
@@ -76,6 +97,13 @@ const getEnvironmentValues = async (req, res) => {
       outOfRange:
         lightSensor?.min_value && lightSensor?.max_value
           ? light < lightSensor.min_value || light > lightSensor.max_value
+            ? raiseOutOfRange(
+                "light",
+                light,
+                lightSensor.min_value,
+                lightSensor.max_value
+              )
+            : "NO"
           : null,
     };
 

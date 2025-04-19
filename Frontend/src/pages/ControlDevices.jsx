@@ -5,7 +5,7 @@ import { axiosInstance } from "../util/http.js";
 import { Space, Table, Switch, Row, Col, Slider, InputNumber } from "antd";
 import { toast } from "react-hot-toast";
 
-const deviceNames = ["Light", "Fan"];
+const deviceNames = ["lightBulb", "fan"];
 
 const AddDeviceModal = ({ isOpen, onClose, onAdd }) => {
   const [deviceName, setDeviceName] = useState("");
@@ -431,6 +431,7 @@ const ControlDevices = () => {
       toast.success(newDeviceArray.data.message);
     } catch (error) {
       console.log("error in addDevice: ", error);
+      toast.error(error.response.data.message);
     }
   };
 

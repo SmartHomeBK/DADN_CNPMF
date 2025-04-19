@@ -107,6 +107,13 @@ const addDevice = async (req, res) => {
       });
     }
 
+    const existedName = await Device.findOne({ name });
+    if (existedName)
+      return res.status(400).json({
+        message: "Name device is existed !!!",
+        success: false,
+      });
+
     if (max_value !== undefined && typeof max_value !== "number") {
       return res.status(400).json({ error: "max_value must be a number" });
     }
