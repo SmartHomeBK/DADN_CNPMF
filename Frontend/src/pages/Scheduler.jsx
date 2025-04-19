@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BellRing, User, Plus, Clock, Trash2, Sun, Fan, Thermometer, Droplets } from "lucide-react";
+import { axiosInstance } from '../util/http';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -58,12 +59,8 @@ const ScheduleCard = ({ schedule, onDelete }) => {
   );
 };
 
-const deviceNames = [
-  "Light",
-  "Fan",
-];
-
 const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
+  const [deviceNames, setDeviceNames] = useState([]);
   const [schedule, setSchedule] = useState({
     deviceName: '',
     deviceType: 'light',
@@ -73,7 +70,25 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
     value: '',
     timeValue: '12:00',
   });
+  
+  useEffect(() => {
+    if (isOpen) {
+      const fetchDeviceNames = async () => {
+        try {
+          const res = await axiosInstance.get("/devices"); 
+          const allDevices = res.data;
 
+          const uniqueNames = [...new Set(allDevices.map(d => d.name))];
+          setDeviceNames(uniqueNames);  
+        } catch (err) {
+          console.error("Lỗi khi lấy tên thiết bị:", err);
+          toast.error("Có lỗi khi lấy danh sách thiết bị!");
+        }
+      };
+
+      fetchDeviceNames();  
+    }
+  }, [isOpen]);
   const handleSubmit = (e) => {
     e.preventDefault();
     const deviceId = `${schedule.deviceType}_${Date.now()}`;
@@ -106,26 +121,18 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
               >
                 <option value="" disabled>
                   Select a device
-                </option>
-                {deviceNames.map((name, index) => (
-                  <option key={index} value={name}>
-                    {name}
                   </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Device Type
-              </label>
-              <select
-                value={schedule.deviceType}
-                onChange={(e) => setSchedule({ ...schedule, deviceType: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="light">Light</option>
-                <option value="tempurature">Tempurature</option>
+                {deviceNames.length > 0 ? (
+                  deviceNames.map((name, index) => (
+                    <option key={index} value={name}>
+                      {name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>
+                    No devices available
+                  </option>
+                )}
               </select>
             </div>
 
