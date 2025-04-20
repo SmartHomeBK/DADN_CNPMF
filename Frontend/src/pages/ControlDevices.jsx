@@ -469,7 +469,7 @@ const ControlDevices = () => {
     <div className="w-full">
       <div className="w-full p-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="font-['Italianno'] text-[70px] text-black">
+          <h1 className=" text-[65px] font-semibold text-black">
             Control Devices
           </h1>
           <button

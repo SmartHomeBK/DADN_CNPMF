@@ -21,19 +21,12 @@ const HomeTemplate = () => {
   const items = [
     {
       key: "1",
-      label: (
-        <Link to={"/user-infor"}>
-          My Account
-        </Link>
-      ),
+      label: <Link to={"/user-infor"}>My Account</Link>,
     },
     {
       key: "2",
       label: (
-        <a
-          type="primary"
-          onClick={showModal}
-        >
+        <a type="primary" onClick={showModal}>
           Logout
         </a>
       ),
@@ -97,7 +90,9 @@ const HomeTemplate = () => {
             <div className="px-5 pt-[100px]">
               <button
                 className={`w-[187px] h-[65px] rounded-2xl transition-colors ${
-                  isActive("/") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                  isActive("/")
+                    ? "bg-[#d4c7b0]"
+                    : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
                 }`}
                 onClick={() => navigate("/")}
               >
@@ -107,7 +102,9 @@ const HomeTemplate = () => {
               </button>
               <button
                 className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
-                  isActive("/statistics") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                  isActive("/statistics")
+                    ? "bg-[#d4c7b0]"
+                    : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
                 }`}
                 onClick={() => navigate("/statistics")}
               >
@@ -117,7 +114,9 @@ const HomeTemplate = () => {
               </button>
               <button
                 className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
-                  isActive("/control-devices") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                  isActive("/control-devices")
+                    ? "bg-[#d4c7b0]"
+                    : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
                 }`}
                 onClick={() => navigate("/control-devices")}
               >
@@ -127,7 +126,9 @@ const HomeTemplate = () => {
               </button>
               <button
                 className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
-                  isActive("/scheduler") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                  isActive("/scheduler")
+                    ? "bg-[#d4c7b0]"
+                    : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
                 }`}
                 onClick={() => navigate("/scheduler")}
               >
@@ -150,7 +151,7 @@ const HomeTemplate = () => {
   return (
     <div className="w-full min-h-screen bg-white">
       {/* Top Navigation Bar */}
-      <div className="w-full h-[104px] bg-[#d09696] flex justify-between items-center px-8">
+      <div className="w-full h-[104px] bg-[#d09696] flex justify-between items-center px-8 ">
         <div
           className="w-[158px] h-[158px] relative top-[2.5rem] cursor-pointer hover:scale-105 transition-transform duration-300"
           onClick={() => navigate("/")}
@@ -179,21 +180,23 @@ const HomeTemplate = () => {
 
       {/* Sidebar */}
       <div className="flex">
-        <div className="left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
+        <div className="left-0 top-[10px] w-[227px] min-h-[calc(100vh-104px)] bg-[#d09696]">
           <div className="px-5 pt-[100px]">
             <button
               className={`w-[187px] h-[65px] rounded-2xl transition-colors ${
-                isActive("/") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                isActive("/")
+                  ? "bg-[#d4c7b0]"
+                  : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
               }`}
               onClick={() => navigate("/")}
             >
-              <span className="font-inter text-base text-[#21255a]">
-                Home
-              </span>
+              <span className="font-inter text-base text-[#21255a]">Home</span>
             </button>
             <button
               className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
-                isActive("/statistics") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                isActive("/statistics")
+                  ? "bg-[#d4c7b0]"
+                  : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
               }`}
               onClick={() => navigate("/statistics")}
             >
@@ -203,7 +206,9 @@ const HomeTemplate = () => {
             </button>
             <button
               className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
-                isActive("/control-devices") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                isActive("/control-devices")
+                  ? "bg-[#d4c7b0]"
+                  : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
               }`}
               onClick={() => navigate("/control-devices")}
             >
@@ -213,7 +218,21 @@ const HomeTemplate = () => {
             </button>
             <button
               className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
-                isActive("/scheduler") ? "bg-[#d4c7b0]" : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+                isActive("/control-devices")
+                  ? "bg-[#d4c7b0]"
+                  : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
+              }`}
+              onClick={() => navigate("/control-sensors")}
+            >
+              <span className="font-inter text-base text-[#21255a]">
+                Control Sensors
+              </span>
+            </button>
+            <button
+              className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
+                isActive("/scheduler")
+                  ? "bg-[#d4c7b0]"
+                  : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
               }`}
               onClick={() => navigate("/scheduler")}
             >

@@ -14,6 +14,7 @@ import { axiosInstance } from "../util/http.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsAuth, setIsCheckingAuth, setUser } from "../redux/authSlice.js";
 import UserInformation from "../components/UserInformation.jsx";
+import ControlSensors from "../pages/ControlSensors/ControlSensors.jsx";
 const customRoute = () => {
   const dispatch = useDispatch();
   const { isAuth, isCheckingAuth } = useSelector((state) => state.auth);
@@ -53,6 +54,30 @@ const customRoute = () => {
           path: "control-devices",
           element: <ControlDevices />,
         },
+        {
+          path: "/temperature-details",
+          element: <TemperatureDetails />,
+        },
+        {
+          path: "/humidity-details",
+          element: <HumidityDetails />,
+        },
+        {
+          path: "/light-intensity-details",
+          element: <LightIntensityDetails />,
+        },
+        {
+          path: "/statistics",
+          element: <Statistics />,
+        },
+        {
+          path: "/control-sensors",
+          element: <ControlSensors />,
+        },
+        {
+          path: "/scheduler",
+          element: <Scheduler />,
+        },
       ],
     },
     {
@@ -62,27 +87,6 @@ const customRoute = () => {
     {
       path: "/signup",
       element: <SignUp />,
-    },
-    {
-      path: "/statistics",
-      element: <Statistics />,
-    },
-    {
-      path: "/temperature-details",
-      element: <TemperatureDetails />,
-    },
-    {
-      path: "/humidity-details",
-      element: <HumidityDetails />,
-    },
-    {
-      path: "/light-intensity-details",
-      element: <LightIntensityDetails />,
-    },
-
-    {
-      path: "/scheduler",
-      element: <Scheduler />,
     },
   ]);
   if (isCheckingAuth) {

@@ -1,25 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { BellRing, User, Plus, Clock, Trash2, Sun, Fan, Thermometer, Droplets } from "lucide-react";
-import { axiosInstance } from '../util/http';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  BellRing,
+  User,
+  Plus,
+  Clock,
+  Trash2,
+  Sun,
+  Fan,
+  Thermometer,
+  Droplets,
+} from "lucide-react";
+import { axiosInstance } from "../util/http";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ScheduleCard = ({ schedule, onDelete }) => {
   const getIcon = (deviceType) => {
     switch (deviceType) {
-      case 'light': return <Sun className="w-6 h-6" />;
-      case 'fan': return <Fan className="w-6 h-6" />;
-      default: return null;
+      case "light":
+        return <Sun className="w-6 h-6" />;
+      case "fan":
+        return <Fan className="w-6 h-6" />;
+      default:
+        return null;
     }
   };
 
   const getConditionIcon = (conditionType) => {
     switch (conditionType) {
-      case 'temperature': return <Thermometer className="w-5 h-5 text-red-500" />;
-      case 'humidity': return <Droplets className="w-5 h-5 text-blue-500" />;
-      case 'light': return <Sun className="w-5 h-5 text-yellow-500" />;
-      case 'time': return <Clock className="w-5 h-5 text-purple-500" />;
-      default: return null;
+      case "temperature":
+        return <Thermometer className="w-5 h-5 text-red-500" />;
+      case "humidity":
+        return <Droplets className="w-5 h-5 text-blue-500" />;
+      case "light":
+        return <Sun className="w-5 h-5 text-yellow-500" />;
+      case "time":
+        return <Clock className="w-5 h-5 text-purple-500" />;
+      default:
+        return null;
     }
   };
 
@@ -30,7 +48,9 @@ const ScheduleCard = ({ schedule, onDelete }) => {
           {getIcon(schedule.deviceType)}
           <div>
             <h3 className="text-lg font-semibold">{schedule.deviceName}</h3>
-            <p className="text-xs text-gray-500">Device ID: {schedule.deviceId}</p>
+            <p className="text-xs text-gray-500">
+              Device ID: {schedule.deviceId}
+            </p>
             <p className="text-sm text-gray-500">Turn {schedule.action}</p>
           </div>
         </div>
@@ -45,14 +65,19 @@ const ScheduleCard = ({ schedule, onDelete }) => {
       <div className="flex items-center gap-2 mb-2">
         {getConditionIcon(schedule.conditionType)}
         <span className="text-sm">
-          {schedule.conditionType === 'time' 
+          {schedule.conditionType === "time"
             ? `At ${schedule.timeValue}`
-            : `When ${schedule.conditionType} ${schedule.operator} ${schedule.value}${
-                schedule.conditionType === 'temperature' ? '°C' :
-                schedule.conditionType === 'humidity' ? '%' :
-                schedule.conditionType === 'light' ? ' lux' : ''
-              }`
-          }
+            : `When ${schedule.conditionType} ${schedule.operator} ${
+                schedule.value
+              }${
+                schedule.conditionType === "temperature"
+                  ? "°C"
+                  : schedule.conditionType === "humidity"
+                  ? "%"
+                  : schedule.conditionType === "light"
+                  ? " lux"
+                  : ""
+              }`}
         </span>
       </div>
     </div>
@@ -62,31 +87,31 @@ const ScheduleCard = ({ schedule, onDelete }) => {
 const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
   const [deviceNames, setDeviceNames] = useState([]);
   const [schedule, setSchedule] = useState({
-    deviceName: '',
-    deviceType: 'light',
-    action: 'on',
-    conditionType: 'time',
-    operator: '>=',
-    value: '',
-    timeValue: '12:00',
+    deviceName: "",
+    deviceType: "light",
+    action: "on",
+    conditionType: "time",
+    operator: ">=",
+    value: "",
+    timeValue: "12:00",
   });
-  
+
   useEffect(() => {
     if (isOpen) {
       const fetchDeviceNames = async () => {
         try {
-          const res = await axiosInstance.get("/devices"); 
+          const res = await axiosInstance.get("/devices");
           const allDevices = res.data;
 
-          const uniqueNames = [...new Set(allDevices.map(d => d.name))];
-          setDeviceNames(uniqueNames);  
+          const uniqueNames = [...new Set(allDevices.map((d) => d.name))];
+          setDeviceNames(uniqueNames);
         } catch (err) {
           console.error("Lỗi khi lấy tên thiết bị:", err);
           toast.error("Có lỗi khi lấy danh sách thiết bị!");
         }
       };
 
-      fetchDeviceNames();  
+      fetchDeviceNames();
     }
   }, [isOpen]);
   const handleSubmit = (e) => {
@@ -115,13 +140,15 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
               </label>
               <select
                 value={schedule.deviceName}
-                onChange={(e) => setSchedule({ ...schedule, deviceName: e.target.value })}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, deviceName: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
                 <option value="" disabled>
                   Select a device
-                  </option>
+                </option>
                 {deviceNames.length > 0 ? (
                   deviceNames.map((name, index) => (
                     <option key={index} value={name}>
@@ -142,7 +169,9 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
               </label>
               <select
                 value={schedule.action}
-                onChange={(e) => setSchedule({ ...schedule, action: e.target.value })}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, action: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="on">Turn On</option>
@@ -156,7 +185,9 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
               </label>
               <select
                 value={schedule.conditionType}
-                onChange={(e) => setSchedule({ ...schedule, conditionType: e.target.value })}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, conditionType: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="time">Time</option>
@@ -166,7 +197,7 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
               </select>
             </div>
 
-            {schedule.conditionType === 'time' ? (
+            {schedule.conditionType === "time" ? (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Time
@@ -174,7 +205,9 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                 <input
                   type="time"
                   value={schedule.timeValue}
-                  onChange={(e) => setSchedule({ ...schedule, timeValue: e.target.value })}
+                  onChange={(e) =>
+                    setSchedule({ ...schedule, timeValue: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -187,7 +220,9 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                   </label>
                   <select
                     value={schedule.operator}
-                    onChange={(e) => setSchedule({ ...schedule, operator: e.target.value })}
+                    onChange={(e) =>
+                      setSchedule({ ...schedule, operator: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value=">=">Greater than or equal to</option>
@@ -202,7 +237,9 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                   <input
                     type="number"
                     value={schedule.value}
-                    onChange={(e) => setSchedule({ ...schedule, value: e.target.value })}
+                    onChange={(e) =>
+                      setSchedule({ ...schedule, value: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder={`Enter ${schedule.conditionType} value`}
                     required
@@ -243,94 +280,33 @@ const Scheduler = () => {
   };
 
   const handleDeleteSchedule = (scheduleId) => {
-    setSchedules(schedules.filter(schedule => schedule.id !== scheduleId));
+    setSchedules(schedules.filter((schedule) => schedule.id !== scheduleId));
   };
 
   return (
-    <div className="w-full min-h-screen bg-white">
-      {/* Top Navigation Bar */}
-      <div className="w-full h-[104px] bg-[#d09696] flex justify-between items-center px-8">
-        <div className="w-[158px] h-[158px] relative top-[2.5rem]">
-          <img
-            src="https://dashboard.codeparrot.ai/api/image/Z9kVsJIdzXb5OlZt/mask-gro.png"
-            alt="Smart Home Logo"
-            className="w-full h-full object-cover"
+    <div className="w-full p-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="font-['Italianno'] text-[70px] text-black">
+          Device Scheduler
+        </h1>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          Add Schedule
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {schedules.map((schedule) => (
+          <ScheduleCard
+            key={schedule.id}
+            schedule={schedule}
+            onDelete={handleDeleteSchedule}
           />
-        </div>
-        <div className="flex gap-6">
-          <button className="w-10 h-10 hover:opacity-80 transition-opacity">
-            <BellRing className="w-8 h-8" />
-          </button>
-          <button className="w-10 h-10 hover:opacity-80 transition-opacity bg-slate-100 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8" />
-          </button>
-        </div>
+        ))}
       </div>
-
-      {/* Sidebar */}
-      <div className="flex">
-        <div className="left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
-          <div className="px-5 pt-[100px]">
-            <button 
-              onClick={() => navigate('/')}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Home
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/statistics')}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Statistic values
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/control-devices')}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Control Devices
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/scheduler')}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Scheduler
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="w-full p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="font-['Italianno'] text-[70px] text-black">Device Scheduler</h1>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Add Schedule
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {schedules.map((schedule) => (
-              <ScheduleCard
-                key={schedule.id}
-                schedule={schedule}
-                onDelete={handleDeleteSchedule}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
       <AddScheduleModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -340,4 +316,4 @@ const Scheduler = () => {
   );
 };
 
-export default Scheduler; 
+export default Scheduler;
