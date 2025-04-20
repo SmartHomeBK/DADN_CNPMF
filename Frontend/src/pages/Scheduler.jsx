@@ -1,24 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { BellRing, User, Plus, Clock, Trash2, Sun, Fan, Thermometer, Droplets } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  BellRing,
+  User,
+  Plus,
+  Clock,
+  Trash2,
+  Sun,
+  Fan,
+  Thermometer,
+  Droplets,
+} from "lucide-react";
+import { axiosInstance } from "../util/http";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const ScheduleCard = ({ schedule, onDelete }) => {
   const getIcon = (deviceType) => {
     switch (deviceType) {
-      case 'light': return <Sun className="w-6 h-6" />;
-      case 'fan': return <Fan className="w-6 h-6" />;
-      default: return null;
+      case "light":
+        return <Sun className="w-6 h-6" />;
+      case "fan":
+        return <Fan className="w-6 h-6" />;
+      default:
+        return null;
     }
   };
 
   const getConditionIcon = (conditionType) => {
     switch (conditionType) {
-      case 'temperature': return <Thermometer className="w-5 h-5 text-red-500" />;
-      case 'humidity': return <Droplets className="w-5 h-5 text-blue-500" />;
-      case 'light': return <Sun className="w-5 h-5 text-yellow-500" />;
-      case 'time': return <Clock className="w-5 h-5 text-purple-500" />;
-      default: return null;
+      case "temperature":
+        return <Thermometer className="w-5 h-5 text-red-500" />;
+      case "humidity":
+        return <Droplets className="w-5 h-5 text-blue-500" />;
+      case "light":
+        return <Sun className="w-5 h-5 text-yellow-500" />;
+      case "time":
+        return <Clock className="w-5 h-5 text-purple-500" />;
+      default:
+        return null;
     }
   };
 
@@ -26,15 +46,19 @@ const ScheduleCard = ({ schedule, onDelete }) => {
     <div className="bg-white rounded-xl shadow-md p-6">
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
-          {getIcon(schedule.deviceType)}
+          {getIcon(schedule.device.type)}
           <div>
-            <h3 className="text-lg font-semibold">{schedule.deviceName}</h3>
-            <p className="text-xs text-gray-500">Device ID: {schedule.deviceId}</p>
-            <p className="text-sm text-gray-500">Turn {schedule.action}</p>
+            <h3 className="text-lg font-semibold">{schedule.device.name}</h3>
+            <p className="text-xs text-gray-500">
+              Device ID: {schedule.device._id}
+            </p>
+            <p className="text-sm text-gray-500">
+              Turn {schedule.action === true ? "On" : "Off"}
+            </p>
           </div>
         </div>
         <button
-          onClick={() => onDelete(schedule.id)}
+          onClick={() => onDelete(schedule._id)}
           className="text-red-500 hover:text-red-700"
         >
           <Trash2 className="w-5 h-5" />
@@ -43,45 +67,26 @@ const ScheduleCard = ({ schedule, onDelete }) => {
 
       <div className="flex items-center gap-2 mb-2">
         {getConditionIcon(schedule.conditionType)}
-        <span className="text-sm">
-          {schedule.conditionType === 'time' 
-            ? `At ${schedule.timeValue}`
-            : `When ${schedule.conditionType} ${schedule.operator} ${schedule.value}${
-                schedule.conditionType === 'temperature' ? '°C' :
-                schedule.conditionType === 'humidity' ? '%' :
-                schedule.conditionType === 'light' ? ' lux' : ''
-              }`
-          }
-        </span>
+        <span className="text-sm">At {schedule.start_time}</span>
       </div>
     </div>
   );
 };
 
-const deviceNames = [
-  "Light",
-  "Fan",
-];
-
-const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
+const AddScheduleModal = ({ isOpen, onClose, onAdd, device }) => {
   const [schedule, setSchedule] = useState({
-    deviceName: '',
-    deviceType: 'light',
-    action: 'on',
-    conditionType: 'time',
-    operator: '>=',
-    value: '',
-    timeValue: '12:00',
+    deviceName: "",
+    action: "1",
+    timeValue: "12:00",
   });
-
+  console.log("schedule: ", schedule);
   const handleSubmit = (e) => {
     e.preventDefault();
-    const deviceId = `${schedule.deviceType}_${Date.now()}`;
-    const scheduleId = `schedule_${Date.now()}`;
+
     onAdd({
-      ...schedule,
-      id: scheduleId,
-      deviceId: deviceId,
+      deviceId: schedule.deviceName,
+      start_time: schedule.timeValue,
+      action: schedule.action,
     });
     onClose();
   };
@@ -100,32 +105,26 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
               </label>
               <select
                 value={schedule.deviceName}
-                onChange={(e) => setSchedule({ ...schedule, deviceName: e.target.value })}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, deviceName: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
                 <option value="" disabled>
                   Select a device
                 </option>
-                {deviceNames.map((name, index) => (
-                  <option key={index} value={name}>
-                    {name}
+                {device.length > 0 ? (
+                  device.map((d, index) => (
+                    <option key={index} value={d._id}>
+                      {d.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>
+                    No devices available
                   </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Device Type
-              </label>
-              <select
-                value={schedule.deviceType}
-                onChange={(e) => setSchedule({ ...schedule, deviceType: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="light">Light</option>
-                <option value="tempurature">Tempurature</option>
+                )}
               </select>
             </div>
 
@@ -135,21 +134,25 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
               </label>
               <select
                 value={schedule.action}
-                onChange={(e) => setSchedule({ ...schedule, action: e.target.value })}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, action: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="on">Turn On</option>
-                <option value="off">Turn Off</option>
+                <option value="1">Turn On</option>
+                <option value="0">Turn Off</option>
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Condition Type
               </label>
               <select
                 value={schedule.conditionType}
-                onChange={(e) => setSchedule({ ...schedule, conditionType: e.target.value })}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, conditionType: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="time">Time</option>
@@ -157,52 +160,22 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                 <option value="humidity">Humidity</option>
                 <option value="light">Light Intensity</option>
               </select>
+            </div> */}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Time
+              </label>
+              <input
+                type="time"
+                value={schedule.timeValue}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, timeValue: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
             </div>
-
-            {schedule.conditionType === 'time' ? (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Time
-                </label>
-                <input
-                  type="time"
-                  value={schedule.timeValue}
-                  onChange={(e) => setSchedule({ ...schedule, timeValue: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-            ) : (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Operator
-                  </label>
-                  <select
-                    value={schedule.operator}
-                    onChange={(e) => setSchedule({ ...schedule, operator: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value=">=">Greater than or equal to</option>
-                    <option value="<=">Less than or equal to</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Value
-                  </label>
-                  <input
-                    type="number"
-                    value={schedule.value}
-                    onChange={(e) => setSchedule({ ...schedule, value: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder={`Enter ${schedule.conditionType} value`}
-                    required
-                  />
-                </div>
-              </>
-            )}
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
@@ -230,107 +203,89 @@ const Scheduler = () => {
   const navigate = useNavigate();
   const [schedules, setSchedules] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleAddSchedule = (newSchedule) => {
-    setSchedules([...schedules, newSchedule]);
+  const [device, setDevice] = useState([]);
+  const fetchDevice = async () => {
+    return await axiosInstance.get("/devices");
   };
 
-  const handleDeleteSchedule = (scheduleId) => {
-    setSchedules(schedules.filter(schedule => schedule.id !== scheduleId));
+  const fetchScheduler = async () => {
+    return await axiosInstance.get("/schedules");
+  };
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const [deviceData, scheduleData] = await Promise.all([
+          fetchDevice(),
+          fetchScheduler(),
+        ]);
+
+        console.log("Device:", deviceData);
+        console.log("Schedule:", scheduleData);
+
+        setDevice(deviceData.data);
+        setSchedules(scheduleData.data); // nếu BE trả về { schedules: [...] }
+      } catch (err) {
+        console.log("Error in fetchAll:", err);
+      }
+    };
+
+    fetchAll();
+  }, []);
+  const handleAddSchedule = async (newSchedule) => {
+    try {
+      const res = await axiosInstance.post("/schedules/", newSchedule);
+      console.log("res in handleAddSchedule: ", res);
+      toast.success(res.data.message);
+      setSchedules((prev) => [...prev, res.data.returnValue]);
+    } catch (error) {
+      console.log("error in handleAddSchedule: ", error);
+    }
+  };
+
+  const handleDeleteSchedule = async (scheduleId) => {
+    try {
+      const res = await axiosInstance.delete(`/schedules/${scheduleId}`);
+      console.log("xóa thành công: ", res);
+      setSchedules(schedules.filter((schedule) => schedule._id !== scheduleId));
+      toast.success(res.data.message);
+    } catch (error) {
+      console.log("error in handleDeleteSchedule: ", error);
+    }
   };
 
   return (
-    <div className="w-full min-h-screen bg-white">
-      {/* Top Navigation Bar */}
-      <div className="w-full h-[104px] bg-[#d09696] flex justify-between items-center px-8">
-        <div className="w-[158px] h-[158px] relative top-[2.5rem]">
-          <img
-            src="https://dashboard.codeparrot.ai/api/image/Z9kVsJIdzXb5OlZt/mask-gro.png"
-            alt="Smart Home Logo"
-            className="w-full h-full object-cover"
+    <div className="w-full p-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="font-['Italianno'] text-[70px] text-black">
+          Device Scheduler
+        </h1>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          Add Schedule
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {schedules.map((schedule) => (
+          <ScheduleCard
+            key={schedule._id}
+            schedule={schedule}
+            onDelete={handleDeleteSchedule}
           />
-        </div>
-        <div className="flex gap-6">
-          <button className="w-10 h-10 hover:opacity-80 transition-opacity">
-            <BellRing className="w-8 h-8" />
-          </button>
-          <button className="w-10 h-10 hover:opacity-80 transition-opacity bg-slate-100 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8" />
-          </button>
-        </div>
+        ))}
       </div>
-
-      {/* Sidebar */}
-      <div className="flex">
-        <div className="left-0 top-[10px] w-[227px] h-[calc(100vh-104px)] bg-[#d09696]">
-          <div className="px-5 pt-[100px]">
-            <button 
-              onClick={() => navigate('/')}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Home
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/statistics')}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Statistic values
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/control-devices')}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Control Devices
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/scheduler')}
-              className="w-[187px] h-[65px] bg-[#f5e7d4] rounded-2xl hover:bg-[#e5d7c4] transition-colors mt-4"
-            >
-              <span className="font-inter text-base text-[#21255a]">
-                Scheduler
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="w-full p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="font-['Italianno'] text-[70px] text-black">Device Scheduler</h1>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Add Schedule
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {schedules.map((schedule) => (
-              <ScheduleCard
-                key={schedule.id}
-                schedule={schedule}
-                onDelete={handleDeleteSchedule}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
       <AddScheduleModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAdd={handleAddSchedule}
+        device={device}
       />
     </div>
   );
 };
 
-export default Scheduler; 
+export default Scheduler;

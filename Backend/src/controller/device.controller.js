@@ -107,6 +107,13 @@ const addDevice = async (req, res) => {
       });
     }
 
+    const existedName = await Device.findOne({ name });
+    if (existedName)
+      return res.status(400).json({
+        message: "Name device is existed !!!",
+        success: false,
+      });
+
     if (max_value !== undefined && typeof max_value !== "number") {
       return res.status(400).json({ error: "max_value must be a number" });
     }
@@ -307,7 +314,7 @@ const deleteDevice = async (req, res) => {
     const result = await Device.deleteOne({ _id });
     res.status(200).json({
       success: true,
-      message: "Delete Cv successfully!",
+      message: "Delete device successfully!",
     });
   } catch (error) {
     console.log("error in deleteDevice: ", error);

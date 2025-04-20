@@ -1,6 +1,6 @@
-import axios from 'axios';
-import Sensor from '../models/sensor.model.js';
-import { BASE_URL, headers } from '../../config/adafruit.js';
+import axios from "axios";
+import Sensor from "../models/sensor.model.js";
+import { BASE_URL, headers } from "../../config/adafruit.js";
 
 /**
  * @swagger
@@ -19,17 +19,17 @@ import { BASE_URL, headers } from '../../config/adafruit.js';
  *         description: Internal server error
  */
 const getAllSensors = async (req, res) => {
-    try {
-        const sensors = await Sensor.find();
-        res.status(200).json({
-            success: true,
-            message: 'Sensors retrieved successfully',
-            sensors,
-        });
-    } catch (error) {
-        console.error('Error retrieving sensors:', error.message);
-        res.status(500).json({ error: 'Failed to retrieve sensors' });
-    }
+  try {
+    const sensors = await Sensor.find();
+    res.status(200).json({
+      success: true,
+      message: "Sensors retrieved successfully",
+      sensors,
+    });
+  } catch (error) {
+    console.error("Error retrieving sensors:", error.message);
+    res.status(500).json({ error: "Failed to retrieve sensors" });
+  }
 };
 
 /**
@@ -59,24 +59,24 @@ const getAllSensors = async (req, res) => {
  *         description: Internal server error
  */
 const getSensorByType = async (req, res) => {
-    const { type } = req.params;
+  const { type } = req.params;
 
-    try {
-        const sensor = await Sensor.findOne({ type });
+  try {
+    const sensor = await Sensor.findOne({ type });
 
-        if (!sensor) {
-            return res.status(404).json({ error: 'Sensor not found' });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'Sensor retrieved successfully',
-            sensor,
-        });
-    } catch (error) {
-        console.error('Error retrieving sensor:', error.message);
-        res.status(500).json({ error: 'Failed to retrieve sensor' });
+    if (!sensor) {
+      return res.status(404).json({ error: "Sensor not found" });
     }
+
+    res.status(200).json({
+      success: true,
+      message: "Sensor retrieved successfully",
+      sensor,
+    });
+  } catch (error) {
+    console.error("Error retrieving sensor:", error.message);
+    res.status(500).json({ error: "Failed to retrieve sensor" });
+  }
 };
 
 /**
@@ -117,39 +117,37 @@ const getSensorByType = async (req, res) => {
  *         description: Internal server error
  */
 const addSensor = async (req, res) => {
-    const { type, max_value, min_value } = req.body;
+  const { type, max_value, min_value } = req.body;
 
-    if (!type || max_value === undefined || min_value === undefined) {
-        return res
-            .status(400)
-            .json({ error: 'Type, max_value, and min_value are required.' });
+  if (!type || max_value === undefined || min_value === undefined) {
+    return res
+      .status(400)
+      .json({ error: "Type, max_value, and min_value are required." });
+  }
+
+  try {
+    const existingSensor = await Sensor.findOne({ type });
+    if (existingSensor) {
+      return res.status(400).json({ error: "Sensor type already exists." });
     }
 
-    try {
-        const existingSensor = await Sensor.findOne({ type });
-        if (existingSensor) {
-            return res
-                .status(400)
-                .json({ error: 'Sensor type already exists.' });
-        }
+    const newSensor = new Sensor({
+      type,
+      max_value,
+      min_value,
+      user: req.user._id,
+    });
+    await newSensor.save();
 
-        const newSensor = new Sensor({
-            type,
-            max_value,
-            min_value,
-            user: req.user._id,
-        });
-        await newSensor.save();
-
-        res.status(201).json({
-            success: true,
-            message: 'Sensor added successfully',
-            sensor: newSensor,
-        });
-    } catch (error) {
-        console.error('Error adding sensor:', error.message);
-        res.status(500).json({ error: 'Failed to add sensor' });
-    }
+    res.status(201).json({
+      success: true,
+      message: "Sensor added successfully",
+      sensor: newSensor,
+    });
+  } catch (error) {
+    console.error("Error adding sensor:", error.message);
+    res.status(500).json({ error: "Failed to add sensor" });
+  }
 };
 
 /**
@@ -194,63 +192,31 @@ const addSensor = async (req, res) => {
  *         description: Internal server error
  */
 const setThreshold = async (req, res) => {
-    const { type } = req.params;
-    const { max_value, min_value } = req.body;
+  const { type } = req.params;
+  const { max_value, min_value } = req.body;
 
-    if (max_value === undefined || min_value === undefined) {
-        return res
-            .status(400)
-            .json({ error: 'Max value and min value are required.' });
+  try {
+    const update = {
+      ...(min_value !== undefined && { min_value }),
+      ...(max_value !== undefined && { max_value }),
+      last_updated: new Date(),
+    };
+    const updatedSensor = await Sensor.findOneAndUpdate({ type }, update, {
+      new: true,
+    });
+
+    if (!updatedSensor) {
+      return res.status(404).json({ error: "Sensor not found" });
     }
 
-    try {
-        const updatedSensor = await Sensor.findOneAndUpdate(
-            { type },
-            { max_value, min_value },
-            { new: true }
-        );
-
-        if (!updatedSensor) {
-            return res.status(404).json({ error: 'Sensor not found' });
-        }
-
-        const adafruitIoUrl = `${BASE_URL}/${type}/threshold`;
-        const response = await axios.post(
-            adafruitIoUrl,
-            {
-                value: JSON.stringify({
-                    max_value: updatedSensor.max_value,
-                    min_value: updatedSensor.min_value,
-                }),
-            },
-            {
-                headers,
-            }
-        );
-
-        if (response.status === 200) {
-            const history = new History({
-                device: updatedSensor._id,
-                user: req.user._id,
-                message: `Threshold set to max: ${max_value}, min: ${min_value} by ${req.user.name}`,
-                time: new Date(),
-            });
-            await history.save();
-
-            res.status(200).json({
-                success: true,
-                message: 'Threshold updated and sent to Adafruit IO',
-                sensor: updatedSensor,
-            });
-        } else {
-            res.status(500).json({
-                error: 'Failed to send threshold to Adafruit IO',
-            });
-        }
-    } catch (error) {
-        console.error('Error setting threshold:', error.message);
-        res.status(500).json({ error: 'Failed to set threshold' });
-    }
+    res.status(200).json({
+      message: "Update Sensor successfully!",
+      updatedSensor,
+    });
+  } catch (error) {
+    console.error("Error setting threshold:", error.message);
+    res.status(500).json({ error: "Failed to set threshold" });
+  }
 };
 
 export { setThreshold, getSensorByType, getAllSensors, addSensor };
