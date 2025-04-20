@@ -61,6 +61,7 @@ const HistoryPage = () => {
             title: 'Time',
             dataIndex: 'time',
             key: 'time',
+            width: 150,
             render: (time) => moment(time).format('YYYY-MM-DD HH:mm:ss'),
             sorter: (a, b) => moment(a.time).unix() - moment(b.time).unix(),
         },
@@ -68,6 +69,7 @@ const HistoryPage = () => {
             title: 'Device',
             dataIndex: 'device',
             key: 'device',
+            width: 150,
             render: (device) => device?.name || 'N/A',
             sorter: (a, b) =>
                 (a.device?.name || '').localeCompare(b.device?.name || ''),
@@ -82,33 +84,10 @@ const HistoryPage = () => {
             title: 'User',
             dataIndex: 'user',
             key: 'user',
+            width: 200,
             render: (user) => user?.name || 'System',
             sorter: (a, b) =>
                 (a.user?.name || '').localeCompare(b.user?.name || ''),
-        },
-        {
-            title: 'Type',
-            key: 'type',
-            render: (_, record) => {
-                const isSensor = record.message
-                    .toLowerCase()
-                    .includes('sensor');
-                return (
-                    <Tag color={isSensor ? 'blue' : 'green'}>
-                        {isSensor ? 'Sensor' : 'Device'}
-                    </Tag>
-                );
-            },
-            filters: [
-                { text: 'Device', value: 'device' },
-                { text: 'Sensor', value: 'sensor' },
-            ],
-            onFilter: (value, record) => {
-                const isSensor = record.message
-                    .toLowerCase()
-                    .includes('sensor');
-                return value === 'sensor' ? isSensor : !isSensor;
-            },
         },
     ];
 
