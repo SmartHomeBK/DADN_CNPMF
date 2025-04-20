@@ -6,9 +6,6 @@ on:
         branches: [master, staging]
     
     # Schedule cron job to run every hour
-    schedule:
-        - cron: '0 * * * *' # Runs every hour on the hour
-
 jobs:
     deploy:
         runs-on: ubuntu-latest
