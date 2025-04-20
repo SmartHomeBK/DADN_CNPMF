@@ -314,7 +314,7 @@ const deleteDevice = async (req, res) => {
     const result = await Device.deleteOne({ _id });
     res.status(200).json({
       success: true,
-      message: "Delete Cv successfully!",
+      message: "Delete device successfully!",
     });
   } catch (error) {
     console.log("error in deleteDevice: ", error);
