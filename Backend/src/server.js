@@ -35,7 +35,10 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "https://dadn-cnpmf-2hpi-9qeujpouw-hatranbks-projects.vercel.app/",
+    origin: [
+      "https://dadn-cnpmf-2hpi-9qeujpouw-hatranbks-projects.vercel.app/",
+      "http://localhost:5173",
+    ],
     method: ["POST", "PUT", "DELETE", "GET"],
     allowedHeaders: ["Content-Type", "Authorization"], // Add any custom headers you might use
     credentials: true,

@@ -115,7 +115,7 @@ const getEnvironmentValues = async (req, res) => {
       "Error fetching environment data:",
       error.response ? error.response.data : error.message
     );
-    res.status(500).json({ error: "Failed to fetch environment data" });
+    res.status(500).json({ error });
   }
 };
 
