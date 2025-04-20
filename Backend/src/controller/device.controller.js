@@ -162,12 +162,12 @@ const addDevice = async (req, res) => {
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: name
+ *         name: device
  *         required: true
  *         description: Device name to control
  *         schema:
  *           type: string
- *           example: "Fan"
+ *           example: "fan"
  *     requestBody:
  *       required: true
  *       content:
@@ -175,10 +175,10 @@ const addDevice = async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               status:
+ *               state:
  *                 type: string
  *                 enum: [on, off]
- *                 example: "on"
+ *                 example: "1"
  *     responses:
  *       200:
  *         description: Successfully controlled device

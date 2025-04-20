@@ -3,11 +3,12 @@ const token = localStorage.getItem("UserToken");
 
 console.log(
   "token in http: ",
+  import.meta.env.VITE_BASE_URL,
   token,
   "https://smart-home-iot-backend.onrender.com/api"
 );
 export const axiosInstance = axios.create({
-  baseURL: "https://smart-home-iot-backend.onrender.com/api",
+  baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
   timeout: 30000,
   headers: {
