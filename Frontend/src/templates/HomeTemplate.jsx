@@ -218,7 +218,7 @@ const HomeTemplate = () => {
             </button>
             <button
               className={`w-[187px] h-[65px] rounded-2xl transition-colors mt-4 ${
-                isActive("/control-devices")
+                isActive("/control-sensors")
                   ? "bg-[#d4c7b0]"
                   : "bg-[#f5e7d4] hover:bg-[#e5d7c4]"
               }`}

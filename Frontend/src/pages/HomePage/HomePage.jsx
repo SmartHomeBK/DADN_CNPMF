@@ -12,6 +12,7 @@ const HomePage = ({
   humidity = 6,
   lightIntensity = 334,
 }) => {
+  const [time, setTime] = useState(new Date().toLocaleString("vi-VN"));
   const [environmentValues, setEnvironmentValues] = useState({
     humid: "",
     temperature: "",
@@ -29,6 +30,7 @@ const HomePage = ({
         temperature: temp.value,
         light: light.value,
       });
+      setTime(new Date().toLocaleString("vi-VN"));
       const objectEnv = result.data;
       Object.keys(objectEnv).forEach((key) => {
         if (
@@ -63,8 +65,8 @@ const HomePage = ({
               />
             </div>
             <div>
-              <p className="font-inter text-[10px] font-medium text-black">
-                {date}
+              <p className="font-inter text-[16px] font-medium text-black">
+                {time}
               </p>
               <p className="font-inter text-[14px] font-semibold text-black mt-4">
                 {weather}
