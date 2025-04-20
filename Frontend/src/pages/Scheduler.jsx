@@ -13,6 +13,7 @@ import {
 import { axiosInstance } from "../util/http";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const ScheduleCard = ({ schedule, onDelete }) => {
   const getIcon = (deviceType) => {
@@ -45,17 +46,19 @@ const ScheduleCard = ({ schedule, onDelete }) => {
     <div className="bg-white rounded-xl shadow-md p-6">
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
-          {getIcon(schedule.deviceType)}
+          {getIcon(schedule.device.type)}
           <div>
-            <h3 className="text-lg font-semibold">{schedule.deviceName}</h3>
+            <h3 className="text-lg font-semibold">{schedule.device.name}</h3>
             <p className="text-xs text-gray-500">
-              Device ID: {schedule.deviceId}
+              Device ID: {schedule.device._id}
             </p>
-            <p className="text-sm text-gray-500">Turn {schedule.action}</p>
+            <p className="text-sm text-gray-500">
+              Turn {schedule.action === true ? "On" : "Off"}
+            </p>
           </div>
         </div>
         <button
-          onClick={() => onDelete(schedule.id)}
+          onClick={() => onDelete(schedule._id)}
           className="text-red-500 hover:text-red-700"
         >
           <Trash2 className="w-5 h-5" />
@@ -64,64 +67,26 @@ const ScheduleCard = ({ schedule, onDelete }) => {
 
       <div className="flex items-center gap-2 mb-2">
         {getConditionIcon(schedule.conditionType)}
-        <span className="text-sm">
-          {schedule.conditionType === "time"
-            ? `At ${schedule.timeValue}`
-            : `When ${schedule.conditionType} ${schedule.operator} ${
-                schedule.value
-              }${
-                schedule.conditionType === "temperature"
-                  ? "°C"
-                  : schedule.conditionType === "humidity"
-                  ? "%"
-                  : schedule.conditionType === "light"
-                  ? " lux"
-                  : ""
-              }`}
-        </span>
+        <span className="text-sm">At {schedule.start_time}</span>
       </div>
     </div>
   );
 };
 
-const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
-  const [deviceNames, setDeviceNames] = useState([]);
+const AddScheduleModal = ({ isOpen, onClose, onAdd, device }) => {
   const [schedule, setSchedule] = useState({
     deviceName: "",
-    deviceType: "light",
-    action: "on",
-    conditionType: "time",
-    operator: ">=",
-    value: "",
+    action: "1",
     timeValue: "12:00",
   });
-
-  useEffect(() => {
-    if (isOpen) {
-      const fetchDeviceNames = async () => {
-        try {
-          const res = await axiosInstance.get("/devices");
-          const allDevices = res.data;
-
-          const uniqueNames = [...new Set(allDevices.map((d) => d.name))];
-          setDeviceNames(uniqueNames);
-        } catch (err) {
-          console.error("Lỗi khi lấy tên thiết bị:", err);
-          toast.error("Có lỗi khi lấy danh sách thiết bị!");
-        }
-      };
-
-      fetchDeviceNames();
-    }
-  }, [isOpen]);
+  console.log("schedule: ", schedule);
   const handleSubmit = (e) => {
     e.preventDefault();
-    const deviceId = `${schedule.deviceType}_${Date.now()}`;
-    const scheduleId = `schedule_${Date.now()}`;
+
     onAdd({
-      ...schedule,
-      id: scheduleId,
-      deviceId: deviceId,
+      deviceId: schedule.deviceName,
+      start_time: schedule.timeValue,
+      action: schedule.action,
     });
     onClose();
   };
@@ -149,10 +114,10 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                 <option value="" disabled>
                   Select a device
                 </option>
-                {deviceNames.length > 0 ? (
-                  deviceNames.map((name, index) => (
-                    <option key={index} value={name}>
-                      {name}
+                {device.length > 0 ? (
+                  device.map((d, index) => (
+                    <option key={index} value={d._id}>
+                      {d.name}
                     </option>
                   ))
                 ) : (
@@ -174,12 +139,12 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="on">Turn On</option>
-                <option value="off">Turn Off</option>
+                <option value="1">Turn On</option>
+                <option value="0">Turn Off</option>
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Condition Type
               </label>
@@ -195,58 +160,22 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd }) => {
                 <option value="humidity">Humidity</option>
                 <option value="light">Light Intensity</option>
               </select>
+            </div> */}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Time
+              </label>
+              <input
+                type="time"
+                value={schedule.timeValue}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, timeValue: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
             </div>
-
-            {schedule.conditionType === "time" ? (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Time
-                </label>
-                <input
-                  type="time"
-                  value={schedule.timeValue}
-                  onChange={(e) =>
-                    setSchedule({ ...schedule, timeValue: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-            ) : (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Operator
-                  </label>
-                  <select
-                    value={schedule.operator}
-                    onChange={(e) =>
-                      setSchedule({ ...schedule, operator: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value=">=">Greater than or equal to</option>
-                    <option value="<=">Less than or equal to</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Value
-                  </label>
-                  <input
-                    type="number"
-                    value={schedule.value}
-                    onChange={(e) =>
-                      setSchedule({ ...schedule, value: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder={`Enter ${schedule.conditionType} value`}
-                    required
-                  />
-                </div>
-              </>
-            )}
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
@@ -274,13 +203,55 @@ const Scheduler = () => {
   const navigate = useNavigate();
   const [schedules, setSchedules] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleAddSchedule = (newSchedule) => {
-    setSchedules([...schedules, newSchedule]);
+  const [device, setDevice] = useState([]);
+  const fetchDevice = async () => {
+    return await axiosInstance.get("/devices");
   };
 
-  const handleDeleteSchedule = (scheduleId) => {
-    setSchedules(schedules.filter((schedule) => schedule.id !== scheduleId));
+  const fetchScheduler = async () => {
+    return await axiosInstance.get("/schedules");
+  };
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const [deviceData, scheduleData] = await Promise.all([
+          fetchDevice(),
+          fetchScheduler(),
+        ]);
+
+        console.log("Device:", deviceData);
+        console.log("Schedule:", scheduleData);
+
+        setDevice(deviceData.data);
+        setSchedules(scheduleData.data); // nếu BE trả về { schedules: [...] }
+      } catch (err) {
+        console.log("Error in fetchAll:", err);
+      }
+    };
+
+    fetchAll();
+  }, []);
+  const handleAddSchedule = async (newSchedule) => {
+    try {
+      const res = await axiosInstance.post("/schedules/", newSchedule);
+      console.log("res in handleAddSchedule: ", res);
+      toast.success(res.data.message);
+      setSchedules((prev) => [...prev, res.data.returnValue]);
+    } catch (error) {
+      console.log("error in handleAddSchedule: ", error);
+    }
+  };
+
+  const handleDeleteSchedule = async (scheduleId) => {
+    try {
+      const res = await axiosInstance.delete(`/schedules/${scheduleId}`);
+      console.log("xóa thành công: ", res);
+      setSchedules(schedules.filter((schedule) => schedule._id !== scheduleId));
+      toast.success(res.data.message);
+    } catch (error) {
+      console.log("error in handleDeleteSchedule: ", error);
+    }
   };
 
   return (
@@ -301,7 +272,7 @@ const Scheduler = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {schedules.map((schedule) => (
           <ScheduleCard
-            key={schedule.id}
+            key={schedule._id}
             schedule={schedule}
             onDelete={handleDeleteSchedule}
           />
@@ -311,6 +282,7 @@ const Scheduler = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAdd={handleAddSchedule}
+        device={device}
       />
     </div>
   );

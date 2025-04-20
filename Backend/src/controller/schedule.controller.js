@@ -1,10 +1,10 @@
-import axios from 'axios';
-import Schedule from '../models/schedule.model.js';
-import History from '../models/history.model.js';
-import Device from '../models/device.model.js';
-import dotenv from 'dotenv';
+import axios from "axios";
+import Schedule from "../models/schedule.model.js";
+import History from "../models/history.model.js";
+import Device from "../models/device.model.js";
+import dotenv from "dotenv";
 
-dotenv.config({ path: './../Backend/config/.env' });
+dotenv.config({ path: "./../Backend/config/.env" });
 
 /**
  * @swagger
@@ -46,16 +46,16 @@ dotenv.config({ path: './../Backend/config/.env' });
  *         description: Internal server error
  */
 const getAllSchedules = async (req, res) => {
-    try {
-        const schedules = await Schedule.find().populate(
-            'device',
-            'name type status location'
-        ); // Populate device data
-        res.status(200).json(schedules);
-    } catch (error) {
-        console.error('Error fetching schedules:', error.message);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+  try {
+    const schedules = await Schedule.find().populate(
+      "device",
+      "name type status location"
+    ); // Populate device data
+    res.status(200).json(schedules);
+  } catch (error) {
+    console.error("Error fetching schedules:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 /**
@@ -108,25 +108,22 @@ const getAllSchedules = async (req, res) => {
  *         description: Internal server error
  */
 const getSchedulesByDeviceName = async (req, res) => {
-    const { deviceName } = req.params;
-    try {
-        const device = await Device.findOne({ name: deviceName });
-        if (!device) {
-            return res.status(404).json({ error: 'Device not found' });
-        }
-
-        const schedules = await Schedule.find({ device: device._id }).populate(
-            'device',
-            'name type status location'
-        );
-        res.status(200).json(schedules);
-    } catch (error) {
-        console.error(
-            'Error fetching schedules by device name:',
-            error.message
-        );
-        res.status(500).json({ error: 'Internal server error' });
+  const { deviceName } = req.params;
+  try {
+    const device = await Device.findOne({ name: deviceName });
+    if (!device) {
+      return res.status(404).json({ error: "Device not found" });
     }
+
+    const schedules = await Schedule.find({ device: device._id }).populate(
+      "device",
+      "name type status location"
+    );
+    res.status(200).json(schedules);
+  } catch (error) {
+    console.error("Error fetching schedules by device name:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 /**
@@ -194,47 +191,57 @@ const getSchedulesByDeviceName = async (req, res) => {
  *         description: Internal server error
  */
 const setSchedule = async (req, res) => {
-    try {
-        const { deviceId, start_time, action } = req.body;
+  try {
+    const { deviceId, start_time, action } = req.body;
 
-        if (!deviceId || !start_time || !action) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        const device = await Device.findById(deviceId);
-        if (!device) {
-            return res.status(404).json({ error: 'Device not found' });
-        }
-        const oldSchedule = await Schedule.findOne({
-            device: deviceId,
-            start_time,
-        });
-        if (oldSchedule) {
-            return res.status(400).json({ error: 'Schedule already exists' });
-        }
-
-        const schedule = new Schedule({ device: deviceId, start_time, action });
-        await schedule.save();
-
-        const history = new History({
-            device: deviceId,
-            user: req.user.id,
-            message: `Scheduled ${action} at ${new Date(
-                start_time
-            ).toLocaleString()} by ${req.user.name}`,
-            time: new Date(),
-        });
-        await history.save();
-
-        res.status(201).json({
-            success: true,
-            message: 'Schedule created and device updated on Adafruit IO',
-            schedule,
-        });
-    } catch (error) {
-        console.error('Error setting schedule:', error.message);
-        res.status(500).json({ error: 'Internal server error' });
+    if (!deviceId || !start_time || !action) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
+
+    const device = await Device.findById(deviceId);
+    if (!device) {
+      return res.status(404).json({ error: "Device not found" });
+    }
+    console.log("device: ", device);
+    const oldSchedule = await Schedule.findOne({
+      device: deviceId,
+      start_time,
+    });
+    if (oldSchedule) {
+      return res.status(400).json({ error: "Schedule already exists" });
+    }
+
+    const schedule = new Schedule({ device: deviceId, start_time, action });
+    await schedule.save();
+
+    const history = new History({
+      device: deviceId,
+      user: req.user.id,
+      message: `Scheduled ${action} at ${new Date(
+        start_time
+      ).toLocaleString()} by ${req.user.name}`,
+      time: new Date(),
+    });
+    await history.save();
+    const returnValue = {
+      ...schedule.toObject(),
+      device: {
+        name: device.name,
+        type: device.type,
+        status: device.status,
+        location: device.location,
+        _id: device._id,
+      },
+    };
+    res.status(201).json({
+      success: true,
+      message: "Schedule created and device updated on Adafruit IO",
+      returnValue,
+    });
+  } catch (error) {
+    console.error("Error setting schedule:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 /**
@@ -275,46 +282,45 @@ const setSchedule = async (req, res) => {
  *         description: Internal server error
  */
 const deleteSchedule = async (req, res) => {
-    try {
-        const { scheduleId } = req.params;
+  try {
+    const { scheduleId } = req.params;
 
-        const schedule = await Schedule.findByIdAndDelete(scheduleId);
+    const schedule = await Schedule.findByIdAndDelete(scheduleId);
 
-        if (!schedule) {
-            return res.status(404).json({ error: 'Schedule not found' });
-        }
-
-        const device = await Device.findById(schedule.device);
-        if (!device) {
-            return res
-                .status(404)
-                .json({ error: 'Device not found for this schedule' });
-        }
-
-        const history = new History({
-            device: schedule.device,
-            user: req.user._id,
-            message: `Deleted schedule for device ${
-                schedule.device
-            } at ${new Date().toLocaleString()}`,
-            time: new Date(),
-        });
-        await history.save();
-
-        res.status(200).json({
-            success: true,
-            message:
-                'Schedule deleted successfully and removed from Adafruit IO',
-        });
-    } catch (error) {
-        console.error('Error deleting schedule:', error.message);
-        res.status(500).json({ error: 'Internal server error' });
+    if (!schedule) {
+      return res.status(404).json({ error: "Schedule not found" });
     }
+
+    const device = await Device.findById(schedule.device);
+    if (!device) {
+      return res
+        .status(404)
+        .json({ error: "Device not found for this schedule" });
+    }
+
+    const history = new History({
+      device: schedule.device,
+      user: req.user._id,
+      message: `Deleted schedule for device ${
+        schedule.device
+      } at ${new Date().toLocaleString()}`,
+      time: new Date(),
+    });
+    await history.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Schedule deleted successfully and removed from Adafruit IO",
+    });
+  } catch (error) {
+    console.error("Error deleting schedule:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export {
-    getAllSchedules,
-    getSchedulesByDeviceName,
-    setSchedule,
-    deleteSchedule,
+  getAllSchedules,
+  getSchedulesByDeviceName,
+  setSchedule,
+  deleteSchedule,
 };
