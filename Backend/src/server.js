@@ -33,14 +33,28 @@ app.use(cookieParser());
 //     })
 // );
 
+const whitelist = [
+  "https://dadn-cnpmf-2hpi.vercel.app",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: true,
-    methods: ["POST", "PUT", "DELETE", "GET"],
-    allowedHeaders: ["Content-Type", "Authorization"], // Add any custom headers you might use
+    origin: function (origin, callback) {
+      if (!origin || whitelist.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// 👇 Xử lý preflight requests (quan trọng khi dùng credentials!)
+app.options("*", cors());
 
 // Swagger configuration
 const swaggerOptions = {
