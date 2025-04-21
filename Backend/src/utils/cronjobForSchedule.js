@@ -19,10 +19,12 @@ cron.schedule('1 * * * * *', async () => {
         });
         console.log('Current time:', currentTime);
 
-        console.log('Schedules found:', schedules);
         await Promise.all(
             schedules.map(async (schedule) => {
                 try {
+                    console.log(
+                        `Processing schedule ${schedule._id} for device ${schedule.device}`
+                    );
                     const device = await Device.findById(schedule.device);
                     if (!device) return;
 
