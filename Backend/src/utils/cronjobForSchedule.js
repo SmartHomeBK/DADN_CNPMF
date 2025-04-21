@@ -21,6 +21,7 @@ cron.schedule('*/5 * * * * *', async () => {
             start_time: currentTime,
         });
         console.log('Current time:', currentTime);
+        console.log('Schedules:', schedules);
         await Promise.all(
             schedules.map(async (schedule) => {
                 try {
