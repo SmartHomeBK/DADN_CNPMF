@@ -8,7 +8,7 @@ import { BASE_URL, headers } from '../../config/adafruit.js';
 dotenv.config();
 
 // Chạy cron job mỗi phút
-cron.schedule('*/5 * * * * *', async () => {
+cron.schedule('* * * * *', async () => {
     const now = new Date();
     const currentTime = now.toTimeString().slice(0, 5); // Lấy HH:mm
 
