@@ -37,9 +37,10 @@ cron.schedule('1 * * * * *', async () => {
                         { value: schedule.action ? '1' : '0' },
                         { headers }
                     );
-                    await Schedule.findByIdAndUpdate(schedule._id, {
-                        $set: { status: schedule.action ? 'on' : 'off' },
-                    });
+                    await Device.updateOne(
+                        { _id: device._id },
+                        { status: schedule.action ? 'on' : 'off' }
+                    );
 
                     await History.create({
                         device: device._id,
