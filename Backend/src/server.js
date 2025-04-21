@@ -9,7 +9,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import cookieParser from 'cookie-parser';
 // cronjob for schedule
-// import './utils/cronjobForSchedule.js';
+import './utils/cronjobForSchedule.js';
 // cronjob for sensorData
 // import './utils/cronjobForSensorData.js';
 import { errorMiddleWare } from './middleWares/errorMiddleware.middleware.js';
@@ -33,6 +33,11 @@ app.use(cookieParser());
 //     })
 // );
 
+const whitelist = [
+    'https://dadn-cnpmf-2hpi.vercel.app',
+    'http://localhost:5173',
+];
+
 app.use(
     cors({
         origin: true,
@@ -41,6 +46,9 @@ app.use(
         credentials: true,
     })
 );
+
+// 👇 Xử lý preflight requests (quan trọng khi dùng credentials!)
+app.options('*', cors());
 
 // Swagger configuration
 const swaggerOptions = {
