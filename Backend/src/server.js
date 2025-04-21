@@ -9,9 +9,9 @@ import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import cookieParser from "cookie-parser";
 // cronjob for schedule
-import "./utils/cronjobForSchedule.js";
+// import './utils/cronjobForSchedule.js';
 // cronjob for sensorData
-import "./utils/cronjobForSensorData.js";
+// import './utils/cronjobForSensorData.js';
 import { errorMiddleWare } from "./middleWares/errorMiddleware.middleware.js";
 
 dotenv.config({ path: "./../Backend/config/.env" });
@@ -41,16 +41,10 @@ const whitelist = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || whitelist.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: true,
+    methods: ["POST", "PUT", "DELETE", "GET"],
+    allowedHeaders: ["Content-Type", "Authorization"], // Add any custom headers you might use
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    // allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
