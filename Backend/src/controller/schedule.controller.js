@@ -216,7 +216,7 @@ const setSchedule = async (req, res) => {
 
         const schedule = new Schedule({ device: deviceId, start_time, action });
         await schedule.save();
-        const user = User.findById(req.user._id);
+        const user = await User.findById(req.user._id);
         const history = new History({
             device: deviceId,
             user: req.user.id,
