@@ -216,13 +216,13 @@ const setSchedule = async (req, res) => {
 
         const schedule = new Schedule({ device: deviceId, start_time, action });
         await schedule.save();
-        const user = await User.findById(req.user._id);
+        const user = req.user;
         const history = new History({
             device: deviceId,
             user: req.user.id,
-            message: `Scheduled ${action} at ${start_time} by ${
-                user ? user.name : 'Unknown'
-            }`,
+            message: `Scheduled turn ${
+                action ? 'on' : 'off'
+            } at ${start_time} by ${user ? user.name : 'Unknown'}`,
             time: new Date(),
         });
         await history.save();
