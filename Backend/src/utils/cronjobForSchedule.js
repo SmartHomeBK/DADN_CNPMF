@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import Schedule from '../models/schedule.model.js';
 import Device from '../models/device.model.js';
 import { BASE_URL, headers } from '../../config/adafruit.js';
+import History from '../models/history.model.js';
 
 dotenv.config();
 
@@ -33,7 +34,17 @@ cron.schedule('* * * * *', async () => {
                         { value: schedule.action ? '1' : '0' },
                         { headers }
                     );
+                    await Schedule.findByIdAndUpdate(schedule._id, {
+                        $set: { status: schedule.action ? 'on' : 'off' },
+                    });
 
+                    await History.create({
+                        device: device._id,
+                        message: `Device ${device.name} turned ${
+                            schedule.action ? 'on' : 'off'
+                        }`,
+                        time: now,
+                    });
                     console.log(
                         `Action ${schedule.action} sent to ${feedName}`
                     );

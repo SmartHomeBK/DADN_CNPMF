@@ -87,7 +87,7 @@ const HistoryPage = () => {
             width: 200,
             render: (user) => user?.name || 'System',
             sorter: (a, b) =>
-                (a.user?.name || '').localeCompare(b.user?.name || ''),
+                (a.user?.name || '').localeCompare(b.user?.name || 'System'),
         },
     ];
 
