@@ -217,7 +217,7 @@ const controlDevice = async (req, res) => {
                 { new: true }
             );
             const user = req.user;
-
+            console.log(updatedDevice);
             if (updatedDevice) {
                 const history = new History({
                     device: updatedDevice._id,

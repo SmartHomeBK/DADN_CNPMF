@@ -11,10 +11,9 @@ dotenv.config();
 // Chạy cron job mỗi phút
 cron.schedule('1 * * * * *', async () => {
     let now = new Date();
-    if (process.env.NODE_ENV === 'PRODUCTION') {
-        now = new Date(now.getTime() + 7 * 60 * 60 * 1000); // cộng 7 giờ
-    }
-    const currentTime = now.toTimeString().slice(0, 5); // Lấy HH:mm
+    const nowVN = new Date(now.getTime() + 7 * 60 * 60 * 1000); // cộng 7 giờ
+
+    const currentTime = nowVN.toTimeString().slice(0, 5); // Lấy HH:mm
 
     try {
         const schedules = await Schedule.find({
