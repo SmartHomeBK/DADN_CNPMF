@@ -3,6 +3,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { BASE_URL, headers } from '../../config/adafruit.js';
 import History from '../models/history.model.js';
+import User from '../models/user.model.js';
 
 dotenv.config({ path: './../Backend/config/.env' });
 
@@ -217,12 +218,12 @@ const controlDevice = async (req, res) => {
                 { status: state, Last_updated: new Date() },
                 { new: true }
             );
-            console.log('updatedDevice: ', updatedDevice);
+            const user = await User.findById(req.user._id);
             if (updatedDevice) {
                 const history = new History({
                     device: updatedDevice._id,
                     user: req.user._id,
-                    message: `${name} turned ${state} by ${req.user.name}`,
+                    message: `Device ${name} turned ${state} by ${user.name}`,
                     time: new Date(),
                 });
                 await history.save();
