@@ -62,7 +62,7 @@ const fetchAndSaveSensorData = async () => {
 
       if (name === "fan") {
         if (tempValue > device.max_value) {
-          axios.post(`${BASE_URL}/fan/data`, { value: 1 }, { headers });
+          axios.post(`${BASE_URL}/fan/data`, { value: "1" }, { headers });
           await Device.updateOne({ _id: device._id }, { status: "on" });
           await History.create({
             device: device._id,
@@ -70,7 +70,7 @@ const fetchAndSaveSensorData = async () => {
             time: timestamp,
           });
         } else if (tempValue < device.min_value) {
-          axios.post(`${BASE_URL}/fan/data`, { value: 0 }, { headers });
+          axios.post(`${BASE_URL}/fan/data`, { value: "0" }, { headers });
           await Device.updateOne({ _id: device._id }, { status: "off" });
           await History.create({
             device: device._id,
@@ -81,7 +81,7 @@ const fetchAndSaveSensorData = async () => {
       }
       if (name === "lightbulb") {
         if (lightValue < device.min_value) {
-          axios.post(`${BASE_URL}/lightbulb/data`, { value: 1 }, { headers });
+          axios.post(`${BASE_URL}/lightbulb/data`, { value: "1" }, { headers });
 
           await Device.updateOne({ _id: device._id }, { status: "on" });
           await History.create({
@@ -90,7 +90,7 @@ const fetchAndSaveSensorData = async () => {
             time: timestamp,
           });
         } else if (lightValue > device.max_value) {
-          axios.post(`${BASE_URL}/lightbulb/data`, { value: 0 }, { headers });
+          axios.post(`${BASE_URL}/lightbulb/data`, { value: "0" }, { headers });
           await Device.updateOne({ _id: device._id }, { status: "off" });
           await History.create({
             device: device._id,
@@ -106,4 +106,4 @@ const fetchAndSaveSensorData = async () => {
 };
 
 // Chạy cron job mỗi 5 giây
-cron.schedule("*/16 * * * * *", fetchAndSaveSensorData);
+cron.schedule("40 * * * * *", fetchAndSaveSensorData);
