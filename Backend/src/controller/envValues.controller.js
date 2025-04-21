@@ -1,11 +1,11 @@
-import axios from "axios";
-import dotenv from "dotenv";
-import { BASE_URL, headers } from "../../config/adafruit.js";
-import SensorData from "../models/sensorData.model.js";
+import axios from 'axios';
+import dotenv from 'dotenv';
+import { BASE_URL, headers } from '../../config/adafruit.js';
+import SensorData from '../models/sensorData.model.js';
 
-dotenv.config({ path: "./../Backend/config/.env" });
+dotenv.config({ path: './../Backend/config/.env' });
 
-import Sensor from "../models/sensor.model.js";
+import Sensor from '../models/sensor.model.js';
 
 /**
  * @swagger
@@ -39,84 +39,86 @@ import Sensor from "../models/sensor.model.js";
  */
 
 const raiseOutOfRange = (type, cur_val, min_val, max_val) => {
-  if (cur_val < min_val)
-    return `Current ${type} value ${cur_val} is under allowed min value: ${min_val}`;
-  else if (cur_val > max_val)
-    return `Current ${type} value ${cur_val} is higher allowed max value: ${max_val}`;
+    if (cur_val < min_val)
+        return `Current ${type} value ${cur_val} is under allowed min value: ${min_val}`;
+    else if (cur_val > max_val)
+        return `Current ${type} value ${cur_val} is higher allowed max value: ${max_val}`;
 };
 const getEnvironmentValues = async (req, res) => {
-  try {
-    const humidSensor = await Sensor.findOne({ type: "humidity" });
-    const tempSensor = await Sensor.findOne({ type: "temperature" });
-    const lightSensor = await Sensor.findOne({ type: "light" });
+    try {
+        const humidSensor = await Sensor.findOne({ type: 'humidity' });
+        const tempSensor = await Sensor.findOne({ type: 'temperature' });
+        const lightSensor = await Sensor.findOne({ type: 'light' });
 
-    const [humidRes, tempRes, lightRes] = await Promise.all([
-      axios.get(`${BASE_URL}/humid`, { headers }),
-      axios.get(`${BASE_URL}/temperature`, { headers }),
-      axios.get(`${BASE_URL}/light`, { headers }),
-    ]);
+        const [humidRes, tempRes, lightRes] = await Promise.all([
+            axios.get(`${BASE_URL}/humid`, { headers }),
+            axios.get(`${BASE_URL}/temperature`, { headers }),
+            axios.get(`${BASE_URL}/light`, { headers }),
+        ]);
 
-    const { last_value: humid } = humidRes.data;
-    const { last_value: temp } = tempRes.data;
-    const { last_value: light } = lightRes.data;
+        const { last_value: humid } = humidRes.data;
+        const { last_value: temp } = tempRes.data;
+        const { last_value: light } = lightRes.data;
 
-    const result = {};
+        const result = {};
 
-    result.humid = {
-      value: humid,
-      outOfRange:
-        humidSensor?.min_value && humidSensor?.max_value
-          ? humid < humidSensor.min_value || humid > humidSensor.max_value
-            ? raiseOutOfRange(
-                "humid",
-                humid,
-                humidSensor.min_value,
-                humidSensor.max_value
-              )
-            : "NO"
-          : null,
-    };
+        result.humid = {
+            value: humid,
+            outOfRange:
+                humidSensor?.min_value && humidSensor?.max_value
+                    ? humid < humidSensor.min_value ||
+                      humid > humidSensor.max_value
+                        ? raiseOutOfRange(
+                              'humid',
+                              humid,
+                              humidSensor.min_value,
+                              humidSensor.max_value
+                          )
+                        : 'NO'
+                    : null,
+        };
 
-    result.temp = {
-      value: temp,
-      outOfRange:
-        tempSensor?.min_value && tempSensor?.max_value
-          ? temp < tempSensor.min_value || temp > tempSensor.max_value
-            ? raiseOutOfRange(
-                "temperature",
-                temp,
-                tempSensor.min_value,
-                tempSensor.max_value
-              )
-            : "NO"
-          : null,
-    };
+        result.temp = {
+            value: temp,
+            outOfRange:
+                tempSensor?.min_value && tempSensor?.max_value
+                    ? temp < tempSensor.min_value || temp > tempSensor.max_value
+                        ? raiseOutOfRange(
+                              'temperature',
+                              temp,
+                              tempSensor.min_value,
+                              tempSensor.max_value
+                          )
+                        : 'NO'
+                    : null,
+        };
 
-    result.light = {
-      value: light,
-      outOfRange:
-        lightSensor?.min_value && lightSensor?.max_value
-          ? light < lightSensor.min_value || light > lightSensor.max_value
-            ? raiseOutOfRange(
-                "light",
-                light,
-                lightSensor.min_value,
-                lightSensor.max_value
-              )
-            : "NO"
-          : null,
-    };
+        result.light = {
+            value: light,
+            outOfRange:
+                lightSensor?.min_value && lightSensor?.max_value
+                    ? light < lightSensor.min_value ||
+                      light > lightSensor.max_value
+                        ? raiseOutOfRange(
+                              'light',
+                              light,
+                              lightSensor.min_value,
+                              lightSensor.max_value
+                          )
+                        : 'NO'
+                    : null,
+        };
 
-    console.log("Fetched and checked data: ", result);
+        console.log('Fetched and checked data: ', result);
 
-    res.json(result);
-  } catch (error) {
-    console.error(
-      "Error fetching environment data:",
-      error.response ? error.response.data : error.message
-    );
-    res.status(500).json({ error });
-  }
+        res.json(result);
+    } catch (error) {
+        console.error(
+            'Error fetching environment data:',
+            error.response ? error.response.data : error.message
+        );
+        res.status(500).json({ error });
+    }
 };
 
 /**
@@ -173,40 +175,44 @@ const getEnvironmentValues = async (req, res) => {
  *         description: Failed to fetch or store environment data
  */
 const getEnvironmentDataInRange = async (req, res) => {
-  const { startTime, endTime } = req.query;
+    const { startTime, endTime } = req.query;
 
-  try {
-    const startDate = new Date(startTime);
-    const endDate = new Date(endTime);
+    try {
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
 
-    const sensorData = await SensorData.find({
-      recorded_at: { $gte: startDate, $lte: endDate },
-    })
-      .populate("sensor", "type")
-      .lean();
+        const sensorData = await SensorData.find({
+            recorded_at: { $gte: startDate, $lte: endDate },
+        })
+            .populate('sensor', 'type')
+            .lean();
 
-    const humidData = sensorData.filter((data) => data.sensor.type === "humid");
-    const tempData = sensorData.filter(
-      (data) => data.sensor.type === "temperature"
-    );
-    const lightData = sensorData.filter((data) => data.sensor.type === "light");
+        const humidData = sensorData.filter(
+            (data) => data.sensor.type === 'humid'
+        );
+        const tempData = sensorData.filter(
+            (data) => data.sensor.type === 'temperature'
+        );
+        const lightData = sensorData.filter(
+            (data) => data.sensor.type === 'light'
+        );
 
-    const humidValues = humidData.map((data) => data.value);
-    const tempValues = tempData.map((data) => data.value);
-    const lightValues = lightData.map((data) => data.value);
+        const humidValues = humidData.map((data) => data.value);
+        const tempValues = tempData.map((data) => data.value);
+        const lightValues = lightData.map((data) => data.value);
 
-    res.status(200).json({
-      humid: humidValues,
-      temp: tempValues,
-      light: lightValues,
-    });
-  } catch (error) {
-    console.error(
-      "Error fetching environment data from the database:",
-      error.message
-    );
-    res.status(500).json({ error: "Failed to fetch environment data" });
-  }
+        res.status(200).json({
+            humid: humidValues,
+            temp: tempValues,
+            light: lightValues,
+        });
+    } catch (error) {
+        console.error(
+            'Error fetching environment data from the database:',
+            error.message
+        );
+        res.status(500).json({ error: 'Failed to fetch environment data' });
+    }
 };
 
 export { getEnvironmentValues, getEnvironmentDataInRange };
