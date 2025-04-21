@@ -210,9 +210,7 @@ const controlDevice = async (req, res) => {
             { value: state },
             { headers }
         );
-        console.log('response from update light: ', response);
         if (response.status === 200) {
-            console.log('feedName: ', name);
             const updatedDevice = await Device.findOneAndUpdate(
                 { name },
                 { status: state, Last_updated: new Date() },
