@@ -10,6 +10,8 @@ import {
   Thermometer,
   Droplets,
 } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { axiosInstance } from "../util/http";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -77,15 +79,25 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd, device }) => {
   const [schedule, setSchedule] = useState({
     deviceName: "",
     action: "1",
-    timeValue: "12:00",
+    timeValue: new Date(),
   });
-  console.log("schedule: ", schedule);
+  console.log(
+    "schedule: ",
+    schedule,
+    schedule.timeValue?.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  );
   const handleSubmit = (e) => {
     e.preventDefault();
 
     onAdd({
       deviceId: schedule.deviceName,
-      start_time: schedule.timeValue,
+      start_time: schedule.timeValue.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       action: schedule.action,
     });
     onClose();
@@ -166,14 +178,28 @@ const AddScheduleModal = ({ isOpen, onClose, onAdd, device }) => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Time
               </label>
-              <input
+              {/* <input
                 type="time"
+                min="01:00"
+                max="23:59"
                 value={schedule.timeValue}
                 onChange={(e) =>
                   setSchedule({ ...schedule, timeValue: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+              /> */}
+              <DatePicker
+                selected={schedule.timeValue}
+                onChange={(date) =>
+                  setSchedule({ ...schedule, timeValue: date })
+                }
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={1}
+                timeFormat="HH:mm"
+                dateFormat="HH:mm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
