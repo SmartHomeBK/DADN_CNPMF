@@ -3,7 +3,7 @@ import Schedule from '../models/schedule.model.js';
 import History from '../models/history.model.js';
 import Device from '../models/device.model.js';
 import dotenv from 'dotenv';
-
+import User from '../models/user.model.js';
 dotenv.config({ path: './../Backend/config/.env' });
 
 /**
@@ -216,13 +216,13 @@ const setSchedule = async (req, res) => {
 
         const schedule = new Schedule({ device: deviceId, start_time, action });
         await schedule.save();
-
+        const user = User.findById(req.user._id);
         const history = new History({
             device: deviceId,
             user: req.user.id,
-            message: `Scheduled ${action} at ${new Date(
-                start_time
-            ).toLocaleString()} by ${req.user.name}`,
+            message: `Scheduled ${action} at ${start_time} by ${
+                user ? user.name : 'Unknown'
+            }`,
             time: new Date(),
         });
         await history.save();
