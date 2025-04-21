@@ -61,7 +61,7 @@ const fetchAndSaveSensorData = async () => {
             const name = device.name.toLocaleLowerCase();
 
             if (name === 'fan') {
-                if (tempValue > device.max_value) {
+                if (tempValue > device.max_value && device.status === '0') {
                     axios.post(
                         `${BASE_URL}/fan/data`,
                         { value: '1' },
@@ -76,7 +76,10 @@ const fetchAndSaveSensorData = async () => {
                         message: `Device ${device.name} turned off due to high temperature (${tempValue}°C)`,
                         time: timestamp,
                     });
-                } else if (tempValue < device.min_value) {
+                } else if (
+                    tempValue < device.min_value &&
+                    device.status === '1'
+                ) {
                     axios.post(
                         `${BASE_URL}/fan/data`,
                         { value: '0' },
@@ -94,7 +97,7 @@ const fetchAndSaveSensorData = async () => {
                 }
             }
             if (name === 'lightbulb') {
-                if (lightValue < device.min_value) {
+                if (lightValue < device.min_value && device.status === '0') {
                     axios.post(
                         `${BASE_URL}/lightbulb/data`,
                         { value: '1' },
@@ -110,7 +113,10 @@ const fetchAndSaveSensorData = async () => {
                         message: `Device ${device.name} turned on due to low light (${lightValue})`,
                         time: timestamp,
                     });
-                } else if (lightValue > device.max_value) {
+                } else if (
+                    lightValue > device.max_value &&
+                    device.status === '1'
+                ) {
                     axios.post(
                         `${BASE_URL}/lightbulb/data`,
                         { value: '0' },
