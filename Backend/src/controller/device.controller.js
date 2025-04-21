@@ -216,8 +216,7 @@ const controlDevice = async (req, res) => {
                 { status: state, Last_updated: new Date() },
                 { new: true }
             );
-            const user = await User.findById(req.user._id);
-            console.log(user);
+            const user = req.user;
 
             if (updatedDevice) {
                 const history = new History({
