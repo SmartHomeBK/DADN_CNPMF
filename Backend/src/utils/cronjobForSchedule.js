@@ -9,7 +9,7 @@ import History from '../models/history.model.js';
 dotenv.config();
 
 // Chạy cron job mỗi phút
-cron.schedule('/50 * * * * *', async () => {
+cron.schedule('*/5 * * * * *', async () => {
     const now = new Date();
     const currentTime = now.toTimeString().slice(0, 5); // Lấy HH:mm
 
@@ -18,13 +18,12 @@ cron.schedule('/50 * * * * *', async () => {
             start_time: currentTime,
         });
         console.log('Current time:', currentTime);
-
+        console.log(
+            `Processing schedule ${schedule._id} for device ${schedule.device}`
+        );
         await Promise.all(
             schedules.map(async (schedule) => {
                 try {
-                    console.log(
-                        `Processing schedule ${schedule._id} for device ${schedule.device}`
-                    );
                     const device = await Device.findById(schedule.device);
                     if (!device) return;
 
