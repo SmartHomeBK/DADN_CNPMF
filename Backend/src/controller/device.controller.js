@@ -221,7 +221,9 @@ const controlDevice = async (req, res) => {
                 const history = new History({
                     device: updatedDevice._id,
                     user: req.user._id,
-                    message: `Device ${name} turned ${state} by ${user.name}`,
+                    message: `Device ${name} turned ${
+                        state == '1' ? 'on' : 'off'
+                    } by ${user.name}`,
                     time: new Date(),
                 });
                 await history.save();
