@@ -33,7 +33,7 @@ const Login = () => {
             navigate("/");
           }, 2000);
         } catch (error) {
-          // toast.error(error.response);
+          toast.error(error.response.data.message);
           console.log("error in login: ", error);
         }
       },
