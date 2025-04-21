@@ -64,6 +64,7 @@ const HistoryPage = () => {
             width: 150,
             render: (time) => moment(time).format('YYYY-MM-DD HH:mm:ss'),
             sorter: (a, b) => moment(a.time).unix() - moment(b.time).unix(),
+            defaultSortOrder: 'descend',
         },
         {
             title: 'Device',
