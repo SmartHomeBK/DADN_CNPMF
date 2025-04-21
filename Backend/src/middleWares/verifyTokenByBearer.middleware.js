@@ -14,7 +14,6 @@ export const isUserAuthenticatedByBearer = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        console.log('decoded data: ', decoded);
         req.user = decoded;
         if (!req.user) return res.status(404).json({ message: 'Not found' });
         next();

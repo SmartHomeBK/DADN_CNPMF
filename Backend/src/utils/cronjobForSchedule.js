@@ -9,7 +9,7 @@ import History from '../models/history.model.js';
 dotenv.config();
 
 // Chạy cron job mỗi phút
-cron.schedule('1 * * * * *', async () => {
+cron.schedule('/50 * * * * *', async () => {
     const now = new Date();
     const currentTime = now.toTimeString().slice(0, 5); // Lấy HH:mm
 
