@@ -17,7 +17,7 @@ cron.schedule('*/16 * * * * *', async () => {
         const schedules = await Schedule.find({
             start_time: currentTime,
         });
-
+        console.log('Schedules found:', schedules.length);
         await Promise.all(
             schedules.map(async (schedule) => {
                 try {
