@@ -303,7 +303,7 @@ const deleteSchedule = async (req, res) => {
 
         const history = new History({
             device: schedule.device,
-            user: req.user._id,
+            user: req.user.id,
             message: `Deleted schedule for device`,
             time: new Date(),
         });
