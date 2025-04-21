@@ -10,7 +10,10 @@ dotenv.config();
 
 // Chạy cron job mỗi phút
 cron.schedule('*/5 * * * * *', async () => {
-    const now = new Date();
+    let now = new Date();
+    if (process.env.NODE_ENV === 'PRODUCTION') {
+        now = new Date(now.getTime() + 7 * 60 * 60 * 1000); // cộng 7 giờ
+    }
     const currentTime = now.toTimeString().slice(0, 5); // Lấy HH:mm
 
     try {
@@ -18,9 +21,6 @@ cron.schedule('*/5 * * * * *', async () => {
             start_time: currentTime,
         });
         console.log('Current time:', currentTime);
-        console.log(
-            `Processing schedule ${schedule._id} for device ${schedule.device}`
-        );
         await Promise.all(
             schedules.map(async (schedule) => {
                 try {
