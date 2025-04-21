@@ -82,7 +82,7 @@ const HistoryPage = () => {
             sorter: (a, b) => a.message.localeCompare(b.message),
         },
         {
-            title: 'User',
+            title: 'Actor',
             dataIndex: 'user',
             key: 'user',
             width: 200,
