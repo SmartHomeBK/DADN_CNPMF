@@ -19,7 +19,7 @@ cron.schedule('*/16 * * * * *', async () => {
         });
         console.log('Current time:', currentTime);
 
-        console.log('Schedules found:', schedules.length);
+        console.log('Schedules found:', schedules);
         await Promise.all(
             schedules.map(async (schedule) => {
                 try {
