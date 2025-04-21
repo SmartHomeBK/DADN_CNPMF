@@ -19,8 +19,6 @@ cron.schedule('1 * * * * *', async () => {
         const schedules = await Schedule.find({
             start_time: currentTime,
         });
-        console.log('Current time:', currentTime);
-        console.log('Schedules:', schedules);
         await Promise.all(
             schedules.map(async (schedule) => {
                 try {
@@ -39,7 +37,7 @@ cron.schedule('1 * * * * *', async () => {
                     );
                     await Device.updateOne(
                         { _id: device._id },
-                        { status: schedule.action ? 'on' : 'off' }
+                        { status: schedule.action ? '1' : '0' }
                     );
 
                     await History.create({
