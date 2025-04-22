@@ -367,7 +367,8 @@ const ControlDevices = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
-    fetchDevices();
+    const id = setInterval(() => fetchDevices(), 2 * 1000);
+    return () => clearInterval(id);
   }, []);
 
   const handleUpdateStatus = async (checked, name, index, _id) => {
