@@ -140,4 +140,4 @@ const fetchAndSaveSensorData = async () => {
 };
 
 // Chạy cron job mỗi 16 giây
-cron.schedule('*/30 * * * * *', fetchAndSaveSensorData);
+cron.schedule('*/16 * * * * *', fetchAndSaveSensorData);
