@@ -31,14 +31,14 @@ const HomePage = ({
         light: light.value,
       });
       setTime(new Date().toLocaleString("vi-VN"));
-      // const objectEnv = result.data;
-      // Object.keys(objectEnv).forEach((key) => {
-      //   if (
-      //     objectEnv[key].outOfRange != null &&
-      //     objectEnv[key].outOfRange !== "NO"
-      //   )
-      //     toast.error(objectEnv[key].outOfRange);
-      // });
+      const objectEnv = result.data;
+      Object.keys(objectEnv).forEach((key) => {
+        if (
+          objectEnv[key].outOfRange != null &&
+          objectEnv[key].outOfRange !== "NO"
+        )
+          toast.error(objectEnv[key].outOfRange);
+      });
     } catch (err) {
       console.error("Error fetching data:", err);
     }

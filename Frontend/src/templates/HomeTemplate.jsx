@@ -35,7 +35,7 @@ const HomeTemplate = () => {
   console.log("bạn đang trong homepage!!!");
   useEffect(() => {
     fetchData();
-    const intervalID = setInterval(fetchData, 10000); // Gọi lại mỗi 10 giây
+    const intervalID = setInterval(fetchData, 8000); // Gọi lại mỗi 10 giây
 
     // Dọn dẹp interval khi component unmount
     return () => clearInterval(intervalID);
