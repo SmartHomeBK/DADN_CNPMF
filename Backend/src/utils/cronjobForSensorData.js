@@ -69,7 +69,7 @@ const fetchAndSaveSensorData = async () => {
                     );
                     await Device.updateOne(
                         { _id: device._id },
-                        { status: 'on' }
+                        { status: '1' }
                     );
                     await History.create({
                         device: device._id,
@@ -87,7 +87,7 @@ const fetchAndSaveSensorData = async () => {
                     );
                     await Device.updateOne(
                         { _id: device._id },
-                        { status: 'off' }
+                        { status: '0' }
                     );
                     await History.create({
                         device: device._id,
@@ -106,7 +106,7 @@ const fetchAndSaveSensorData = async () => {
 
                     await Device.updateOne(
                         { _id: device._id },
-                        { status: 'on' }
+                        { status: '1' }
                     );
                     await History.create({
                         device: device._id,
@@ -124,7 +124,7 @@ const fetchAndSaveSensorData = async () => {
                     );
                     await Device.updateOne(
                         { _id: device._id },
-                        { status: 'off' }
+                        { status: '0' }
                     );
                     await History.create({
                         device: device._id,
