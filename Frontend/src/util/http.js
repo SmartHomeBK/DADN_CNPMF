@@ -8,7 +8,7 @@ console.log(
   "https://smart-home-iot-backend.onrender.com/api"
 );
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
   timeout: 30000,
   headers: {
