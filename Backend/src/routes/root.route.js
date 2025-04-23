@@ -10,7 +10,7 @@ import chatbotRouter from './chatbot.route.js';
 
 const root = Router();
 root.use('/api/auth', AuthRouter);
-root.use(isUserAuthenticatedByBearer);
+// root.use(isUserAuthenticatedByBearer);
 root.use('/api/env', EnvRouter);
 root.use('/api/devices', DeviceRoute);
 root.use('/api/sensors', SensorRoute);
